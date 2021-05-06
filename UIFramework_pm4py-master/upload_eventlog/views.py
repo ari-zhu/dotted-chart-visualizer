@@ -19,6 +19,7 @@ def upload_page(request):
     event_logs_path = os.path.join(settings.MEDIA_ROOT,"event_logs")
     n_event_logs_path = os.path.join(settings.MEDIA_ROOT,"none_event_logs")
 
+
     if request.method == 'POST':
         if request.is_ajax():  # currently is not being used (get commented in html file)
             filename = request.POST["log_name"]
