@@ -31,6 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = (
+    'dotted_chart_visualizer.apps.DottedChartVisualizerConfig',
     'upload_eventlog.apps.UploadEventlogConfig',
     'django.contrib.admin',
     'django.contrib.auth',
