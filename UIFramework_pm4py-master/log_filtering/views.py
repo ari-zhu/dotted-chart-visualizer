@@ -10,7 +10,6 @@ from wsgiref.util import FileWrapper
 from pm4py.algo.discovery.alpha import algorithm as alpha_miner
 from pm4py.objects.log.importer.xes import importer
 from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
-from pm4py.algo.discovery.dfg import factory as dfg_factory
 import json
 import re
 import log_filtering.abstraction_support_functions as asf
@@ -27,7 +26,7 @@ def filter(request):
     event_log = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
     log = importer.apply(event_log)
 
-    dfg = dfg_factory.apply(log)
+    dfg = dfg_discovery.apply(log)
     this_data,temp_file = dfg_to_g6(dfg)
     temp_path = os.path.join(settings.MEDIA_ROOT, "temp")
 
@@ -96,7 +95,7 @@ def filter(request):
 
             print("user_abstracted = ", user_abstracted)
             dfg = dfg_discovery.apply(user_abstracted)
-            dfg = dfg_factory.apply(log)
+            dfg = dfg_discovery.apply(log)
             this_data, temp_file = dfg_to_g6(dfg)
 
             return render(request,'filter.html', {'log_name': settings.EVENT_LOG_NAME, 'data':this_data})
@@ -114,7 +113,7 @@ def filter(request):
             event_log = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
             exportPrivacyAwareLog = True
             log = importer.apply(event_log)
-            dfg = dfg_factory.apply(log)
+            dfg = dfg_discovery.apply(log)
             print(dfg)
             this_data,temp_file = dfg_to_g6(dfg)
 

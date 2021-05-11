@@ -1,14 +1,15 @@
 import json
 import traceback
-from pm4py.algo.discovery.dfg import factory as dfg_factory
-from pm4py.objects.conversion.log import factory as conversion_factory
-from pm4py.objects.log.exporter.xes import factory as xes_exporter
-from pm4py.objects.log.importer.csv import factory as csv_importer
-from pm4py.objects.log.importer.xes import factory as xes_import_factory
-from pm4py.visualization.dfg import factory as dfg_vis_factory
+from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
+from pm4py.objects.conversion.log import converter as conversion_factory
+from pm4py.objects.log.exporter.xes import exporter as xes_exporter
+import pandas as pd
+from pm4py.objects.log.importer.xes import importer as xes_import_factory
+from pm4py.visualization.dfg import visualizer as dfg_vis_factory
 from pm4py.algo.filtering.log.attributes import attributes_filter
 from pm4py.util import constants
 import os
+import argparse
 
 
 def import_csv(file):
@@ -18,7 +19,7 @@ def import_csv(file):
     output log object
     '''
     try:
-        event_stream = csv_importer.import_event_stream(file)
+        event_stream = pd.read_csv(file)
         log = conversion_factory.apply(event_stream)
         log = add_classifier(log)
 
@@ -127,7 +128,7 @@ def check_valid_json(file):
     Output: return True if valid json format, otherwise return false
     '''
     try:
-        json_data = open(path, "r").read()
+        json_data = open(file, "r").read()
         patterns = json.loads(json_data)
         if not is_valid_user_input(patterns):
             msg = "%s is not the XES/CSV file" % file

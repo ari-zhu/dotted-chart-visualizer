@@ -4,7 +4,7 @@ import getopt
 import os
 import sys
 
-from pm4py.objects.log.importer.xes import factory as xes_import_factory
+from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 
 import log_filtering.utils as utils
 from log_filtering.abstraction_support_functions import *
