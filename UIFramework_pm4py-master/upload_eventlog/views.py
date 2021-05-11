@@ -10,7 +10,9 @@ from django.http import HttpResponse
 from mimetypes import guess_type
 from wsgiref.util import FileWrapper
 import json
-
+from bootstrapdjango import settings
+import pandas as pd
+from pm4py.objects.conversion.log import converter as log_converter
 
 # Create your views here.
 
@@ -99,11 +101,21 @@ def upload_page(request):
 
                 file_dir = os.path.join(event_logs_path, filename)
 
-                xes_log = xes_importer_factory.apply(file_dir)
-                no_traces = len(xes_log)
-                no_events = sum([len(trace) for trace in xes_log])
-                log_attributes['no_traces'] = no_traces
-                log_attributes['no_events'] = no_events
+                name, extension = os.path.splitext(file_dir)
+
+                if(extension == ".xes"):
+                    xes_log = xes_importer_factory.apply(file_dir)
+                    no_traces = len(xes_log)
+                    no_events = sum([len(trace) for trace in xes_log])
+                    log_attributes['no_traces'] = no_traces
+                    log_attributes['no_events'] = no_events
+
+                elif(extension == ".csv"):
+                    csv_log = log_converter.apply(file_dir)
+                    no_traces = len(csv_log)
+                    no_events = sum([len(trace) for trace in csv_log])
+                    log_attributes['no_traces'] = no_traces
+                    log_attributes['no_events'] = no_events
 
                 eventlogs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
 
