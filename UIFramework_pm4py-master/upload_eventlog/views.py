@@ -10,7 +10,7 @@ from django.http import HttpResponse
 from mimetypes import guess_type
 from wsgiref.util import FileWrapper
 import json
-from bootstrapdjango import settings
+#from "C:\Users\Ariane\Documents\Informatik BSc\6. FS\SPP\dotted-chart-visualizer\UIFramework_pm4py-master\bootstrapdjango" import settings
 import pandas as pd
 from pm4py.objects.conversion.log import converter as log_converter
 
