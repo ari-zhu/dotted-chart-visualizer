@@ -1,0 +1,3 @@
+{
+    "python.analysis.extraPaths": ["./dotted_chart_visualizer/filter_functions.py"]
+}
