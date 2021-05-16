@@ -36,10 +36,8 @@ class graphData:
             df_event_log = pd.read(event_log_file_path, 'r')
             return df_event_log
 
-def filter_df(set_attributes): #set_attributes as [4] or {}
-    for attribute in set_attributes:
-
-
-    return filtered_df
+#def filter_df(set_attributes): #set_attributes as [4] or {}
+    #for attribute in set_attributes:
+    #return filtered_df
 # generic filter 4, attributes
 # return filtered df

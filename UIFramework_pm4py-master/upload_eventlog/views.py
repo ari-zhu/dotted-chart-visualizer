@@ -117,9 +117,14 @@ def upload_page(request):
                     log_attributes['no_traces'] = no_traces
                     log_attributes['no_events'] = no_events
 
-                eventlogs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+                else:
+                    event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+                    message = "Unsupported file type"
+                    return render(request, 'upload.html', {'eventlog_list' : event_logs, 'message': message})
 
-                return render(request, 'upload.html',{'eventlog_list': eventlogs, 'log_name':filename, 'log_attributes':log_attributes})
+                event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+
+                return render(request, 'upload.html',{'eventlog_list': event_logs, 'log_name': filename, 'log_attributes':log_attributes})
 
             elif "downloadButton" in request.POST: #for event logs
                 if "log_list" not in request.POST:

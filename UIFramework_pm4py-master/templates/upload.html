@@ -52,6 +52,10 @@
 
          <div class="row">
           <div class=" col-sm-6 col-md-7 col-lg-8">
+           {% if message %}
+              <p>{{message}}</p>
+               <script> alert("Unsupported File Type");</script>
+           {% endif %}
             {% if log_name %}
               <p> {{log_name}} has been set as the input ... </p>
             {% endif %}

@@ -6,7 +6,7 @@ import os
 from os import listdir
 from os.path import isfile, join
 from django.conf import settings
-from .filter_functions import convert_log_to_df
+#from .filter_functions import convert_log_to_df
 
 # Create your views here.
 
