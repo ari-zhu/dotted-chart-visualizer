@@ -1,13 +1,7 @@
-import shutil
-
 from django.shortcuts import render
 from django.conf import settings
 import os
-from os import path
-from datetime import datetime
-from django.http import HttpResponseRedirect, HttpResponse
-from wsgiref.util import FileWrapper
-from pm4py.algo.discovery.alpha import algorithm as alpha_miner
+from django.http import HttpResponseRedirect
 from pm4py.objects.log.importer.xes import importer
 from pm4py.algo.discovery.dfg import algorithm as dfg_discovery
 import json
@@ -15,8 +9,7 @@ import re
 import log_filtering.abstraction_support_functions as asf
 import log_filtering.utils as utils
 import log_filtering.transformation as trans
-
-
+from bootstrapdjango import settings
 
 
 # Create your views here.
