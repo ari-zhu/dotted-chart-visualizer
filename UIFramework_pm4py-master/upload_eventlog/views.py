@@ -1,5 +1,5 @@
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from django.conf import settings
@@ -7,11 +7,9 @@ import os
 from os import listdir
 from os.path import isfile, join
 from django.http import HttpResponse
-from mimetypes import guess_type
 from wsgiref.util import FileWrapper
 import json
-#from "C:\Users\Ariane\Documents\Informatik BSc\6. FS\SPP\dotted-chart-visualizer\UIFramework_pm4py-master\bootstrapdjango" import settings
-import pandas as pd
+from bootstrapdjango import settings
 from pm4py.objects.conversion.log import converter as log_converter
 
 # Create your views here.
