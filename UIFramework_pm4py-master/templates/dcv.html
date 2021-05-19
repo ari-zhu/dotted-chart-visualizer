@@ -1,5 +1,106 @@
 {%  extends "base.html" %}
 
 {% block content  %}
-<img src="../static/images/MockUI-dcv.png" style="width: 80vw; min-width: auto;" />
+
+<head>
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+</head>
+
+<body>
+<!-- Shows name of file currently in use at top of page-->
+{% if log_name != ':notset:' %}
+    <p style="color:green;"> {{log_name}} is used as input.</p>
+{% else %}
+    <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
+{% endif %}
+
+<!--  <button onclick="myFunction()">Import file</button> -->
+
+<!-- Example dropdown menu-->
+<p>X-axis attribute</p>
+<select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+</select>
+
+<p>Y-axis attribute</p>
+<select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+</select>
+
+<p>Trace Sorting</p>
+<select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+</select>
+
+<p>Color</p>
+<select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+</select>
+
+<p>Shape</p>
+<select name="cars" id="cars">
+    <option value="volvo">Volvo</option>
+    <option value="saab">Saab</option>
+    <option value="mercedes">Mercedes</option>
+    <option value="audi">Audi</option>
+</select>
+
+<!-- Example button-->
+<button onclick="myFunction()">Save visualization</button>
+
+<!-- Example dotted chart -->
+<div id='myDiv'>
+    <script>
+    var trace1 = {
+    x: [1, 2, 3, 4, 5],
+    y: [1, 6, 3, 6, 1],
+    mode: 'markers',
+    type: 'scatter',
+    name: 'Team A',
+    text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+    marker: { size: 12 }
+  };
+  
+  var trace2 = {
+    x: [1.5, 2.5, 3.5, 4.5, 5.5],
+    y: [4, 1, 7, 1, 4],
+    mode: 'markers',
+    type: 'scatter',
+    name: 'Team B',
+    text: ['B-a', 'B-b', 'B-c', 'B-d', 'B-e'],
+    marker: { size: 12 }
+  };
+  
+  var data = [ trace1, trace2 ];
+  
+  var layout = {
+    xaxis: {
+      range: [ 0.75, 5.25 ]
+    },
+    yaxis: {
+      range: [0, 8]
+    },
+    title:'Data Labels Hover'
+  };
+  
+  Plotly.newPlot('myDiv', data, layout);
+  
+  </script></div>
+
+</body>
+
+
 {% endblock %}
