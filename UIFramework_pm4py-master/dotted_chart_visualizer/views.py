@@ -6,9 +6,11 @@ import os
 from os import listdir
 from os.path import isfile, join
 from django.conf import settings
-#from .filter_functions import convert_log_to_df
 
+from dotted_chart_visualizer import filter_functions
 # Create your views here.
 
 def dcv(request):
     return render(request, 'dcv.html')
+
+# def filter(request):
