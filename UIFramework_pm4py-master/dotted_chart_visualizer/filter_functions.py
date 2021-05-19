@@ -68,7 +68,7 @@ def sortByAttribute(df, attributeIndex):
 
 # reduces the number of events of the event log down to a specific range with start and end index
 def delimitNumberOfEvents(df, startIndex, endIndex):
-    if (startIndex < endIndex) &(startIndex >= 0) &(endIndex < len(df)):
+    if (startIndex < endIndex) & (startIndex >= 0) &(endIndex < len(df)):
         try:
             return df.iloc[startIndex : endIndex]
         except:
@@ -77,7 +77,7 @@ def delimitNumberOfEvents(df, startIndex, endIndex):
 # returns only the events of a specific trace with index traceIndex
 def getTrace (df, traceIndex):
     index = "trace " + str(traceIndex)
-    return df.loc [df['case'] == index]
+    return df.loc[df['case'] == index]
 
     
             
