@@ -11,6 +11,6 @@ from dotted_chart_visualizer import filter_functions
 # Create your views here.
 
 def dcv(request):
-    return render(request, 'dcv.html')
+    return render(request, 'dcv.html', {'log_name': settings.EVENT_LOG_NAME})
 
 # def filter(request):
