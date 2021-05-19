@@ -97,13 +97,14 @@ def upload_page(request):
                     return HttpResponseRedirect(request.path_info)
 
                 filename = request.POST["log_list"]
-                settings.EVENT_LOG_NAME = filename
+
 
                 file_dir = os.path.join(event_logs_path, filename)
 
                 name, extension = os.path.splitext(file_dir)
 
                 if(extension == ".xes"):
+                    settings.EVENT_LOG_NAME = filename
                     xes_log = xes_importer_factory.apply(file_dir)
                     no_traces = len(xes_log)
                     no_events = sum([len(trace) for trace in xes_log])
@@ -111,6 +112,7 @@ def upload_page(request):
                     log_attributes['no_events'] = no_events
 
                 elif(extension == ".csv"):
+                    settings.EVENT_LOG_NAME = filename
                     csv_log = log_converter.apply(file_dir)
                     no_traces = len(csv_log)
                     no_events = sum([len(trace) for trace in csv_log])
