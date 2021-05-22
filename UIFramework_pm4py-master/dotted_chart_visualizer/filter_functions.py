@@ -7,7 +7,7 @@ import pandas as pd
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
-
+import re
 
 def convert_log_to_df(request):
     event_logs_path = os.path.join(settings.MEDIA_ROOT, "event_logs")
