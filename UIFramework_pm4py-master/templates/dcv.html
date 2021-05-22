@@ -17,29 +17,33 @@
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
 {% endif %}
 
-<!--
+<!--<p>{{default_x_axis_list1}}</p> <p>{{default_y_axis_list1}}</p>-->
+
 <script> 
-    var default_x = new Array(1,2,3,4,5);
-    var default_y = new Array(1,6,3,6,1);
-</script>
+    var default_x = {{ default_x_axis_list|safe }};
+    var default_y = {{ default_y_axis_list|safe }};
+</script> 
 
 <div id='myDiv'>
     <script>
     var trace1 = {
-    x: default_x, 
+    x: default_x,
     y: default_y,
     mode: 'markers',
     type: 'scatter',
     marker: { size: 12 }
+  };
+
+  var layout = {
+    xaxis: { type: 'category'},
+    yaxis: { type: 'category'}
   };
   
   var data = [ trace1 ];
   
   Plotly.newPlot('myDiv', data, layout);
   
-  </script></div>
-
--->
+  </script></div> 
 
 <!-- Used as an example list of attributes-->
 <!--
@@ -259,68 +263,6 @@ attributesYSelector.addEventListener('change', updateYAttributes, false);
 attributesXSelector.addEventListener('change', updateXAttributes, false);
 </script>
 -->
-  
-
-<!---->
-<script>
-    //var range_x = [0,5];
-    //var range_y = [0,7];
-    
-    var default_trace1 = {
-        x: [1, 2, 3, 4, 5], 
-        y: [1, 6, 3, 6, 1]};
-    
-    var default_trace2 = {
-        x: [1.5, 2.5, 3.5, 4.5, 5.5],
-        y: [4, 1, 7, 1, 4]
-    };
-    var default_visualization = new Array(default_trace1, default_trace2);
-</script> 
-
-<!-- Example dotted chart -->
-<div id='myDiv'>
-    <script>
-    var trace1 = {
-    x: [1, 2, 3, 4, 5], 
-    y: [1, 6, 3, 6, 1],
-    mode: 'markers',
-    type: 'scatter',
-    //name: 'Team A',
-    //text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
-    marker: { size: 12 }
-  };
-  
-  var trace2 = {
-    x: [1.5, 2.5, 3.5, 4.5, 5.5],
-    y: [4, 1, 7, 1, 4],
-    mode: 'markers',
-    type: 'scatter',
-    //name: 'Team B',
-    //text: ['B-a', 'B-b', 'B-c', 'B-d', 'B-e'],
-    marker: { size: 12 }
-  };
-  
-  var data = [ trace1, trace2 ];
-  
-  //var layout = {
-  //  xaxis: {
-  //      range_x
-  //  },
-  //  yaxis: {
-  //      range_y
-  //  },
-  //  title:'Data Labels Hover'
-  //};
-  
-  //Plotly.newPlot('myDiv', data, layout);
-  Plotly.newPlot('myDiv', data);
-
-
-  //myDiv.write_image("images/fig1.png")
-  
-  </script></div>
-
-  <!--<img src="images/fig1.png">--> 
 
 </body>
 
