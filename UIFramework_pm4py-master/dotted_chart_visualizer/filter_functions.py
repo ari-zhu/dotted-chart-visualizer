@@ -22,7 +22,13 @@ def convert_log_to_df(request):
     elif (extension == ".csv"):
         csv_log = log_converter.apply(file_dir)
         df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME)
-
+        
+        if (checkCommaSeparated(df_event_log)):
+            pass
+        else:
+            df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME, sep=';')
+  
+            
     else:
         event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
         message = "Unsupported file type"
@@ -72,3 +78,39 @@ def delimitNumberOfEvents(df, startIndex, endIndex):
 def getTrace (df, traceIndex):
     index = "trace " + str(traceIndex)
     return df.loc [df['case'] == index]
+
+#checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
+def checkCommaSeparated(df):
+    if len ((df.columns) != 1):
+        return True
+    
+#returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
+def setDefault (df):
+    pattern = re.compile("(C|c)ase.*|(T|t)race.*")
+    match1 = None
+        
+    for col in df.columns:
+        match = pattern.match(col)
+    
+        if match is None:
+            pass
+        else:
+            match1 = match.group()
+            break;
+    
+    pattern = re.compile("(E|e)vent.*|(A|a)ctivit.*")
+    match2 = None
+        
+    for col in df.columns:
+        match = pattern.match(col)
+    
+        if match is None:
+            pass
+        else:
+            match2 = match.group()
+            break;
+    if((match1 is None) & (match2 is None)):
+        return df.iloc[:,0], df.iloc[:,1]
+    else: 
+        return df[match1], df[match2]
+    
