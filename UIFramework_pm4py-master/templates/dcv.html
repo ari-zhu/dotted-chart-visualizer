@@ -1,10 +1,12 @@
 {%  extends "base.html" %}
 
+
 {% block content  %}
 
 <head>
 	<!-- Load plotly.js into the DOM -->
-	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'>
+    </script>
 </head>
 
 <body>
@@ -15,23 +17,58 @@
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
 {% endif %}
 
-<!--  <button onclick="myFunction()">Import file</button> -->
+<!--
+<script> 
+    var default_x = new Array(1,2,3,4,5);
+    var default_y = new Array(1,6,3,6,1);
+</script>
+
+<div id='myDiv'>
+    <script>
+    var trace1 = {
+    x: default_x, 
+    y: default_y,
+    mode: 'markers',
+    type: 'scatter',
+    marker: { size: 12 }
+  };
+  
+  var data = [ trace1 ];
+  
+  Plotly.newPlot('myDiv', data, layout);
+  
+  </script></div>
+
+-->
+
+<!-- Used as an example list of attributes-->
+<!--
+<script>
+    var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
+</script>
+-->
 
 <!-- Example dropdown menu-->
+<!--
 <p>X-axis attribute</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
+<select name="X-axis" id="X-axis">
+    <script>
+    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
+    for(i=0; i<attributes_list.length; i++){
+        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
+    }
+    </script>
 </select>
-
+-->
+<!--
 <p>Y-axis attribute</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
+<select name="X-axis" id="X-axis">
+    <script>
+    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
+    for(i=0; i<attributes_list.length; i++){
+        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
+    }
+    </script>
 </select>
 
 <p>Trace Sorting</p>
@@ -57,20 +94,199 @@
     <option value="mercedes">Mercedes</option>
     <option value="audi">Audi</option>
 </select>
-
+-->
 <!-- Example button-->
+<!--
 <button onclick="myFunction()">Save visualization</button>
+
+<div class="showcase__section" id="bubble">
+    <div class="spacer --small"></div>
+    <div id="bubbleplots">
+      <div class="bubbleplot" data-num="0">
+        <div class="plot" id="plotdiv"></div>
+        <div class="control-row">
+        Country:<br>
+        <select class="countrydata">
+          </select>
+        </div>
+      </div>
+    </div>
+</div>
+        
+  <script>
+      //imports data
+      Plotly.d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv', function(err, rows){
+//unpacks data
+function unpack(rows, key) {
+    return rows.map(function(row) { return row[key]; });
+}
+//initializing data variables based on imported data
+var allCountryNames = unpack(rows, 'country'),
+allYear = unpack(rows, 'year'),
+allGdp = unpack(rows, 'gdpPercap'),
+listofCountries = [],
+currentCountry,
+currentGdp = [],
+currentYear = [];
+
+//filling list of countries
+for (var i = 0; i < allCountryNames.length; i++ ){
+if (listofCountries.indexOf(allCountryNames[i]) === -1 ){
+  listofCountries.push(allCountryNames[i]);
+}
+}
+
+//Adapts X and Y coordinates according to the chosen country
+function getCountryData(chosenCountry) {
+currentGdp = [];
+currentYear = [];
+for (var i = 0 ; i < allCountryNames.length ; i++){
+  if ( allCountryNames[i] === chosenCountry ) {
+    currentGdp.push(allGdp[i]);
+    currentYear.push(allYear[i]);
+  } 
+}
+};
+
+// Default Country Data
+setBubblePlot('Afghanistan');
+
+function setBubblePlot(chosenCountry) {
+getCountryData(chosenCountry);  
+
+//Constructed trace
+var trace1 = {
+  x: currentYear,
+  y: currentGdp,
+  mode: 'markers',
+  marker: {
+    symbol: 'diamond',
+    size: 12, 
+    opacity: 0.5
+  }
+};
+
+var data = [trace1];
+
+//var layout = {
+//  title: 'GDP per cap according to Country<br>'+ chosenCountry + ' GDP'
+//};
+
+Plotly.newPlot('plotdiv', data);
+};
+
+var innerContainer = document.querySelector('[data-num="0"'),
+plotEl = innerContainer.querySelector('.plot'),
+countrySelector = innerContainer.querySelector('.countrydata');
+
+function assignOptions(textArray, selector) {
+for (var i = 0; i < textArray.length;  i++) {
+  var currentOption = document.createElement('option');
+  currentOption.text = textArray[i];
+  selector.appendChild(currentOption);
+}
+}
+
+assignOptions(listofCountries, countrySelector);
+
+function updateCountry(){
+setBubblePlot(countrySelector.value);
+}
+
+countrySelector.addEventListener('change', updateCountry, false);
+});
+</script>-->
+
+
+<!--
+
+<div class="showcase__section" id="bubble">
+    <div class="spacer --small"></div>
+    <div id="bubbleplots">
+      <div class="bubbleplot" data-num="0">
+        <div class="plot" id="plotdiv"></div>
+        <div class="control-rowX">
+          X-axis: <select class="xdata">
+          </select>
+        </div>
+        <div class="control-rowY">
+          Y-axis: <select class="ydata">
+          </select>
+        </div>
+      </div>
+    </div>
+</div>
+
+
+
+<script>
+var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
+
+function getChosenAttributesData(chosenAttributeX, chosenAttributeY) {
+currentX = [];
+currentY = [];
+for (var i = 0 ; i < attributes_list.length ; i++){
+  if ( attributes_list[i] === chosenAttributeX ) {
+    currentGdp.push(currentX[i]);
+  } 
+  if ( attributes_list[i] === chosenAttributeX ) {
+    currentGdp.push(currentX[i]);
+  } 
+}
+};
+
+countrySelector = innerContainer.querySelector('.countrydata');
+
+function assignOptions(textArray, selector) {
+for (var i = 0; i < textArray.length;  i++) {
+  var currentOption = document.createElement('option');
+  currentOption.text = textArray[i];
+  selector.appendChild(currentOption);
+}
+}
+
+assignYOptions(listofAttributes, attributesYSelector);
+assignXOptions(listofAttributes, attributesXSelector);
+
+function updateXAttributes(){
+setBubblePlot(attributesXSelector.value);
+}
+function updateYAttributes(){
+setBubblePlot(attributesYSelector.value);
+}
+
+attributesYSelector.addEventListener('change', updateYAttributes, false);
+attributesXSelector.addEventListener('change', updateXAttributes, false);
+</script>
+-->
+  
+
+<!---->
+<script>
+    //var range_x = [0,5];
+    //var range_y = [0,7];
+    
+    var default_trace1 = {
+        x: [1, 2, 3, 4, 5], 
+        y: [1, 6, 3, 6, 1]};
+    
+    var default_trace2 = {
+        x: [1.5, 2.5, 3.5, 4.5, 5.5],
+        y: [4, 1, 7, 1, 4]
+    };
+    var default_visualization = new Array(default_trace1, default_trace2);
+</script> 
 
 <!-- Example dotted chart -->
 <div id='myDiv'>
     <script>
     var trace1 = {
-    x: [1, 2, 3, 4, 5],
+    x: [1, 2, 3, 4, 5], 
     y: [1, 6, 3, 6, 1],
     mode: 'markers',
     type: 'scatter',
-    name: 'Team A',
-    text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
+    //name: 'Team A',
+    //text: ['A-1', 'A-2', 'A-3', 'A-4', 'A-5'],
     marker: { size: 12 }
   };
   
@@ -79,28 +295,35 @@
     y: [4, 1, 7, 1, 4],
     mode: 'markers',
     type: 'scatter',
-    name: 'Team B',
-    text: ['B-a', 'B-b', 'B-c', 'B-d', 'B-e'],
+    //name: 'Team B',
+    //text: ['B-a', 'B-b', 'B-c', 'B-d', 'B-e'],
     marker: { size: 12 }
   };
   
   var data = [ trace1, trace2 ];
   
-  var layout = {
-    xaxis: {
-      range: [ 0.75, 5.25 ]
-    },
-    yaxis: {
-      range: [0, 8]
-    },
-    title:'Data Labels Hover'
-  };
+  //var layout = {
+  //  xaxis: {
+  //      range_x
+  //  },
+  //  yaxis: {
+  //      range_y
+  //  },
+  //  title:'Data Labels Hover'
+  //};
   
-  Plotly.newPlot('myDiv', data, layout);
+  //Plotly.newPlot('myDiv', data, layout);
+  Plotly.newPlot('myDiv', data);
+
+
+  //myDiv.write_image("images/fig1.png")
   
   </script></div>
 
+  <!--<img src="images/fig1.png">--> 
+
 </body>
 
+    {% endblock %}
 
-{% endblock %}
+
