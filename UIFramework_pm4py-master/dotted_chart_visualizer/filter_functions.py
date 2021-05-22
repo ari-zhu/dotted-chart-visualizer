@@ -4,14 +4,14 @@ from os.path import isfile, join
 
 from django.conf import settings
 import pandas as pd
+from django.http import HttpResponse
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
 import re
 
-def convert_log_to_df(request):
-    event_logs_path = os.path.join(settings.MEDIA_ROOT, "event_logs")
-    file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
+def convert_log_to_df(file_dir):
+
 
     name, extension = os.path.splitext(file_dir)
 
@@ -19,15 +19,10 @@ def convert_log_to_df(request):
         xes_log = xes_importer_factory.apply(file_dir)
         df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
 
-    elif (extension == ".csv"):
+    else: #(extension == ".csv"):
         csv_log = log_converter.apply(file_dir)
         df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME)
             
-    else:
-        event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
-        message = "Unsupported file type"
-        return render(request, 'upload.html', {'eventlog_list': event_logs, 'message': message})
-
     return df_event_log
 
 
@@ -79,32 +74,37 @@ def checkCommaSeparated(df):
         return True
     
 #returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
-def setDefault (df):
+def setDefault(df):
     pattern = re.compile("(C|c)ase.*|(T|t)race.*")
     match1 = None
-        
+
     for col in df.columns:
         match = pattern.match(col)
-    
+
         if match is None:
             pass
         else:
             match1 = match.group()
             break;
-    
+
     pattern = re.compile("(E|e)vent.*|(A|a)ctivit.*")
     match2 = None
-        
+
     for col in df.columns:
         match = pattern.match(col)
-    
+
         if match is None:
             pass
         else:
             match2 = match.group()
             break;
-    if((match1 is None) & (match2 is None)):
-        return df.iloc[:,0], df.iloc[:,1]
-    else: 
+    if ((match1 is None) & (match2 is None)):
+        return df.iloc[:, 0], df.iloc[:, 1]
+
+    elif ((match1 is None) & (match2 is not None)):
+        return df.iloc[:, 0], df[match2]
+
+    elif ((match1 is not None) & (match2 is None)):
+        return df[match1], df.iloc[:, 1]
+    else:
         return df[match1], df[match2]
-    
