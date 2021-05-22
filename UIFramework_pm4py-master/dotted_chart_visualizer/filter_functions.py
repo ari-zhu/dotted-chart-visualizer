@@ -22,12 +22,6 @@ def convert_log_to_df(request):
     elif (extension == ".csv"):
         csv_log = log_converter.apply(file_dir)
         df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME)
-        
-        if (checkCommaSeparated(df_event_log)):
-            pass
-        else:
-            df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME, sep=';')
-  
             
     else:
         event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
