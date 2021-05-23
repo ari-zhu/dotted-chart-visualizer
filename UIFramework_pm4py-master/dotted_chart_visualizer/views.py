@@ -24,6 +24,7 @@ def dcv(request):
         # validity check
 
         default_x_axis_df, default_y_axis_df = setDefault(convert_log_to_df(file_dir))
+        x_label, y_label= de
         default_x_axis_list = default_x_axis_df.values.tolist()
         default_y_axis_list = default_y_axis_df.values.tolist()
 
