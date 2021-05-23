@@ -10,20 +10,30 @@ from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
 import re
 
-def convert_log_to_df(file_dir):
-
+def convertLogToDf(file_dir):
 
     name, extension = os.path.splitext(file_dir)
 
     if (extension == ".xes"):
         xes_log = xes_importer_factory.apply(file_dir)
         df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
+        return df_event_log
 
     else: #(extension == ".csv"):
-        csv_log = log_converter.apply(file_dir)
-        df_event_log = log_converter.apply(csv_log, variant=log_converter.Variants.TO_DATA_FRAME)
-            
-    return df_event_log
+        df_event_log = pd.read_csv(file_dir)
+        if (checkCommaSeparated(df_event_log)):
+            return df_event_log
+        else:
+            for letter in df_event_log.columns[0]:
+                if ';' == letter:
+                    df_event_log = pd.read_csv(file_dir, sep=letter)
+                    return df_event_log
+                else:
+                    continue
+            else:
+                df_event_log = pd.read_csv(file_dir)
+                return df_event_log
+
 
 
 # returns the number of events of event log df
@@ -70,7 +80,7 @@ def getTrace (df, traceIndex):
 
 #checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
 def checkCommaSeparated(df):
-    if len ((df.columns) != 1):
+    if len ((df.columns)) != 1:
         return True
     
 #returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
