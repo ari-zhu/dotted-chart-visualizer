@@ -21,18 +21,11 @@ def convertLogToDf(file_dir):
 
     else: #(extension == ".csv"):
         df_event_log = pd.read_csv(file_dir)
-        if (checkCommaSeparated(df_event_log)):
-            return df_event_log
-        else:
-            for letter in df_event_log.columns[0]:
-                if ';' == letter:
-                    df_event_log = pd.read_csv(file_dir, sep=letter)
-                    return df_event_log
-                else:
-                    continue
-            else:
-                df_event_log = pd.read_csv(file_dir)
-                return df_event_log
+        if (not checkCommaSeparated(df_event_log)):
+            separator = ';'
+            if separator in df_event_log.columns[0]:
+                df_event_log = pd.read_csv(file_dir, sep=separator)
+        return df_event_log
 
 
 
