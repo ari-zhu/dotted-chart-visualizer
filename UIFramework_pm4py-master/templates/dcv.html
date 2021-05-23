@@ -5,12 +5,14 @@
 
 <head>
 	<!-- Load plotly.js into the DOM -->
-	<script src='https://cdn.plot.ly/plotly-latest.min.js'>
-    </script>
+
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
+
 </head>
 
 <body>
 <!-- Shows name of file currently in use at top of page-->
+
 {% if error_message %} 
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
 {% else %}
@@ -73,6 +75,7 @@
         document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
     }
     </script>
+
 </select>
 
 <p>Trace Sorting</p>
@@ -98,6 +101,7 @@
     <option value="mercedes">Mercedes</option>
     <option value="audi">Audi</option>
 </select>
+
 -->
 <!-- Example button-->
 <!--
@@ -267,5 +271,6 @@ attributesXSelector.addEventListener('change', updateXAttributes, false);
 </body>
 
     {% endblock %}
+
 
 
