@@ -75,7 +75,7 @@ def checkCommaSeparated(df):
     
 #returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
 def setDefault(df):
-    pattern = re.compile("(C|c)ase.*|(T|t)race.*")
+    pattern = re.compile("case:concept.*|(C|c)ase.*|(T|t)race.*")
     match1 = None
 
     for col in df.columns:
@@ -87,7 +87,7 @@ def setDefault(df):
             match1 = match.group()
             break;
 
-    pattern = re.compile("(E|e)vent.*|(A|a)ctivit.*")
+    pattern = re.compile("concept.*|(E|e)vent.*|(A|a)ctivit.*")
     match2 = None
 
     for col in df.columns:
