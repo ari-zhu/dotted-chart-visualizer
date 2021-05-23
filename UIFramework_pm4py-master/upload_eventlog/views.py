@@ -1,5 +1,5 @@
 from django.core.files.storage import FileSystemStorage
-from django.http import HttpResponse, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from django.conf import settings
@@ -7,11 +7,9 @@ import os
 from os import listdir
 from os.path import isfile, join
 from django.http import HttpResponse
-from mimetypes import guess_type
 from wsgiref.util import FileWrapper
 import json
 from bootstrapdjango import settings
-import pandas as pd
 from pm4py.objects.conversion.log import converter as log_converter
 
 # Create your views here.
@@ -97,13 +95,14 @@ def upload_page(request):
                     return HttpResponseRedirect(request.path_info)
 
                 filename = request.POST["log_list"]
-                settings.EVENT_LOG_NAME = filename
+
 
                 file_dir = os.path.join(event_logs_path, filename)
 
                 name, extension = os.path.splitext(file_dir)
 
                 if(extension == ".xes"):
+                    settings.EVENT_LOG_NAME = filename
                     xes_log = xes_importer_factory.apply(file_dir)
                     no_traces = len(xes_log)
                     no_events = sum([len(trace) for trace in xes_log])
@@ -111,15 +110,21 @@ def upload_page(request):
                     log_attributes['no_events'] = no_events
 
                 elif(extension == ".csv"):
+                    settings.EVENT_LOG_NAME = filename
                     csv_log = log_converter.apply(file_dir)
-                    no_traces = len(csv_log)
-                    no_events = sum([len(trace) for trace in csv_log])
-                    log_attributes['no_traces'] = no_traces
-                    log_attributes['no_events'] = no_events
+                    #no_traces = len(csv_log)
+                    #no_events = sum([len(trace) for trace in csv_log])
+                    log_attributes['no_traces'] = 'not supported'
+                    log_attributes['no_events'] = 'not supported'
 
-                eventlogs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+                else:
+                    event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+                    message = "Unsupported file type"
+                    return render(request, 'upload.html', {'eventlog_list' : event_logs, 'message': message})
 
-                return render(request, 'upload.html',{'eventlog_list': eventlogs, 'log_name':filename, 'log_attributes':log_attributes})
+                event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
+
+                return render(request, 'upload.html',{'eventlog_list': event_logs, 'log_name': filename, 'log_attributes':log_attributes})
 
             elif "downloadButton" in request.POST: #for event logs
                 if "log_list" not in request.POST:
