@@ -112,10 +112,10 @@ def upload_page(request):
                 elif(extension == ".csv"):
                     settings.EVENT_LOG_NAME = filename
                     csv_log = log_converter.apply(file_dir)
-                    no_traces = len(csv_log)
-                    no_events = sum([len(trace) for trace in csv_log])
-                    log_attributes['no_traces'] = no_traces
-                    log_attributes['no_events'] = no_events
+                    #no_traces = len(csv_log)
+                    #no_events = sum([len(trace) for trace in csv_log])
+                    log_attributes['no_traces'] = 'not supported'
+                    log_attributes['no_events'] = 'not supported'
 
                 else:
                     event_logs = [f for f in listdir(event_logs_path) if isfile(join(event_logs_path, f))]
