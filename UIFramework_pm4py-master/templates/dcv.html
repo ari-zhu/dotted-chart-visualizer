@@ -11,12 +11,11 @@
 
 <body>
 <!-- Shows name of file currently in use at top of page-->
-{% if log_name != ':notset:' %}
-    <p style="color:green;"> {{log_name}} is used as input.</p>
-{% else %}
+{% if error_message %} 
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
+{% else %}
+    <p style="color:green;"> {{log_name}} is used as input.</p>
 {% endif %}
-
 <!--<p>{{default_x_axis_list1}}</p> <p>{{default_y_axis_list1}}</p>-->
 
 <script> 
@@ -35,8 +34,9 @@
   };
 
   var layout = {
-    xaxis: { type: 'category'},
-    yaxis: { type: 'category'}
+    showlegend: false,
+    xaxis: { type: 'category', title: '{{ default_x_axis_label|safe }}'},
+    yaxis: { type: 'category', title: '{{ default_y_axis_label|safe }}', automargin: true}
   };
   
   var data = [ trace1 ];
