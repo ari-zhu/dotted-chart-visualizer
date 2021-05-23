@@ -75,11 +75,13 @@ def getTrace (df, traceIndex):
 def checkCommaSeparated(df):
     if len ((df.columns)) != 1:
         return True
-    
-#returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
+
+
+# returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
 def setDefault(df):
     pattern = re.compile("case:concept.*|(C|c)ase.*|(T|t)race.*")
-    match1 = None
+    x_label = None
+    x_column = None
 
     for col in df.columns:
         match = pattern.match(col)
@@ -87,11 +89,12 @@ def setDefault(df):
         if match is None:
             pass
         else:
-            match1 = match.group()
-            break;
+            x_label = match.group()
+            break
 
     pattern = re.compile("concept.*|(E|e)vent.*|(A|a)ctivit.*")
-    match2 = None
+    y_label = None
+    y_column = None
 
     for col in df.columns:
         match = pattern.match(col)
@@ -99,15 +102,24 @@ def setDefault(df):
         if match is None:
             pass
         else:
-            match2 = match.group()
-            break;
-    if ((match1 is None) & (match2 is None)):
-        return df.iloc[:, 0], df.iloc[:, 1]
+            y_label = match.group()
+            break
 
-    elif ((match1 is None) & (match2 is not None)):
-        return df.iloc[:, 0], df[match2]
-
-    elif ((match1 is not None) & (match2 is None)):
-        return df[match1], df.iloc[:, 1]
+    if ((x_label is None) & (y_label is None)):
+        x_column = df.iloc[:, 0]
+        y_column = df.iloc[:, 1]
+        x_label = df.columns[0]
+        y_label = df.columns[1]
+    elif ((x_label is None) & (y_label is not None)):
+        x_column = df.iloc[:, 0]
+        y_column = df[y_label]
+        x_label = df.columns[0]
+    elif ((x_label is not None) & (y_label is None)):
+        x_column = df[x_label]
+        y_column = df.iloc[:, 1]
+        y_label = df.columns[1]
     else:
-        return df[match1], df[match2]
+        x_column = df[x_label]
+        y_column = df[y_label]
+
+    return x_column, y_column, x_label, y_label
