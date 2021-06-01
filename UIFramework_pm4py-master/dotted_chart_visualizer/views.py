@@ -9,6 +9,7 @@ from django.http import HttpResponseRedirect
 from bootstrapdjango import settings
 from .filter_functions import setDefault
 from .filter_functions import convertLogToDf
+from .filter_functions import getAttributeNames
 import pandas as pd
 
 # Create your views here.
@@ -25,8 +26,10 @@ def dcv(request):
             default_x_axis_df, default_y_axis_df, default_x_axis_label, default_y_axis_label = setDefault(convertLogToDf(file_dir))
             default_x_axis_list = default_x_axis_df.values.tolist()
             default_y_axis_list = default_y_axis_df.values.tolist()
+            log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
             return render(request, 'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'default_x_axis_list': default_x_axis_list,
-                                        'default_y_axis_list': default_y_axis_list, 'default_x_axis_label': default_x_axis_label, 'default_y_axis_label': default_y_axis_label})
+                                        'default_y_axis_list': default_y_axis_list, 'default_x_axis_label': default_x_axis_label, 'default_y_axis_label': default_y_axis_label,
+                                                'attribute_list':log_attribute_list})
         else:
             message = "file not valid or separator in CSV file not recognized"
             return render(request, 'dcv.html', {'error_message': message})
