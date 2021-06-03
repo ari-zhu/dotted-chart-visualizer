@@ -5,25 +5,91 @@
 
 <head>
 	<!-- Load plotly.js into the DOM -->
-
-	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'>
+    </script>
 </head>
 
 <body>
 <!-- Shows name of file currently in use at top of page-->
-
 {% if error_message %} 
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
 {% else %}
     <p style="color:green;"> {{log_name}} is used as input.</p>
 {% endif %}
-<!--<p>{{default_x_axis_list1}}</p> <p>{{default_y_axis_list1}}</p>-->
+
+<!-- Dropdown menu selections -->
+<br>
+<div class="row">
+  <div class=" col-sm-6 col-md-7 col-lg-8">
+    <form  name="choice" action="" method = "POST">
+      {% csrf_token %}
+        <p>X-axis:</p>
+        <select name="xaxis_choice">
+          {% for attr in attribute_list %}
+            {% if attr ==  default_label_list.0 %}
+              <option value="{{attr}}" selected>{{attr}}</option>
+            {% else %}
+              <option value="{{attr}}">{{attr}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+
+        <p>Y-axis:</p>
+        <select name="yaxis_choice">
+          {% for attr in attribute_list %}
+            {% if attr ==  default_label_list.1 %}
+              <option value="{{attr}}" selected>{{attr}}</option>
+            {% else %}
+              <option value="{{attr}}">{{attr}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+
+        <p>Color:</p>
+        <select name="color_choice">
+          <option selected hidden>Choose here</option>
+          {% for attr in attribute_list %}
+            <option value="{{attr}}">{{attr}}</option>
+          {% endfor %}
+        </select>
+
+        <p>Shape:</p>
+        <select name="shape_choice">
+          <option selected hidden>Choose here</option>
+          {% for attr in attribute_list %}
+            <option value="{{attr}}">{{attr}}</option>
+          {% endfor %}
+        </select>
+
+        <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+
+    </form>
+  </div>
+</div>
+<br>
 
 <script> 
-    var default_x = {{ default_x_axis_list|safe }};
-    var default_y = {{ default_y_axis_list|safe }};
+    var default_axis = {{ default_axis_list|safe }};
+    var default_x = default_axis[0];
+    var default_y = default_axis[1];
+    //var default_x = {{ default_x_axis_list|safe }};
+    //var default_y = {{ default_y_axis_list|safe }};
+    //for (int i = 0, i<default_axis.length, i++)
+    //{
+        //if(chosen_x_axis == attributes_list[i])
+        //{
+          //var default_x = default_axis[i];
+        //}
+        //if(chosen_y_axis == attributes_list[i])
+        //{
+          //var default_y = default_axis[i];
+        //}
+    //}
+    var default_label = {{default_label_list|safe}};
 </script> 
+
+
+
 
 <div id='myDiv'>
     <script>
@@ -37,240 +103,17 @@
 
   var layout = {
     showlegend: false,
-    xaxis: { type: 'category', title: '{{ default_x_axis_label|safe }}'},
-    yaxis: { type: 'category', title: '{{ default_y_axis_label|safe }}', automargin: true}
+    xaxis: { type: 'category', title: default_label[0]},
+    yaxis: { type: 'category', title: default_label[1], automargin: true}
   };
   
   var data = [ trace1 ];
   
   Plotly.newPlot('myDiv', data, layout);
   
-  </script></div> 
-
-<!-- Used as an example list of attributes-->
-<!--
-<script>
-    var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-</script>
--->
-
-<!-- Example dropdown menu-->
-<!--
-<p>X-axis attribute</p>
-<select name="X-axis" id="X-axis">
-    <script>
-    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-    for(i=0; i<attributes_list.length; i++){
-        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
-    }
-    </script>
-</select>
--->
-<!--
-<p>Y-axis attribute</p>
-<select name="X-axis" id="X-axis">
-    <script>
-    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-    for(i=0; i<attributes_list.length; i++){
-        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
-    }
-    </script>
-
-</select>
-
-<p>Trace Sorting</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
-<p>Color</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
-<p>Shape</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
--->
-<!-- Example button-->
-<!--
-<button onclick="myFunction()">Save visualization</button>
-
-<div class="showcase__section" id="bubble">
-    <div class="spacer --small"></div>
-    <div id="bubbleplots">
-      <div class="bubbleplot" data-num="0">
-        <div class="plot" id="plotdiv"></div>
-        <div class="control-row">
-        Country:<br>
-        <select class="countrydata">
-          </select>
-        </div>
-      </div>
-    </div>
-</div>
-        
-  <script>
-      //imports data
-      Plotly.d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv', function(err, rows){
-//unpacks data
-function unpack(rows, key) {
-    return rows.map(function(row) { return row[key]; });
-}
-//initializing data variables based on imported data
-var allCountryNames = unpack(rows, 'country'),
-allYear = unpack(rows, 'year'),
-allGdp = unpack(rows, 'gdpPercap'),
-listofCountries = [],
-currentCountry,
-currentGdp = [],
-currentYear = [];
-
-//filling list of countries
-for (var i = 0; i < allCountryNames.length; i++ ){
-if (listofCountries.indexOf(allCountryNames[i]) === -1 ){
-  listofCountries.push(allCountryNames[i]);
-}
-}
-
-//Adapts X and Y coordinates according to the chosen country
-function getCountryData(chosenCountry) {
-currentGdp = [];
-currentYear = [];
-for (var i = 0 ; i < allCountryNames.length ; i++){
-  if ( allCountryNames[i] === chosenCountry ) {
-    currentGdp.push(allGdp[i]);
-    currentYear.push(allYear[i]);
-  } 
-}
-};
-
-// Default Country Data
-setBubblePlot('Afghanistan');
-
-function setBubblePlot(chosenCountry) {
-getCountryData(chosenCountry);  
-
-//Constructed trace
-var trace1 = {
-  x: currentYear,
-  y: currentGdp,
-  mode: 'markers',
-  marker: {
-    symbol: 'diamond',
-    size: 12, 
-    opacity: 0.5
-  }
-};
-
-var data = [trace1];
-
-//var layout = {
-//  title: 'GDP per cap according to Country<br>'+ chosenCountry + ' GDP'
-//};
-
-Plotly.newPlot('plotdiv', data);
-};
-
-var innerContainer = document.querySelector('[data-num="0"'),
-plotEl = innerContainer.querySelector('.plot'),
-countrySelector = innerContainer.querySelector('.countrydata');
-
-function assignOptions(textArray, selector) {
-for (var i = 0; i < textArray.length;  i++) {
-  var currentOption = document.createElement('option');
-  currentOption.text = textArray[i];
-  selector.appendChild(currentOption);
-}
-}
-
-assignOptions(listofCountries, countrySelector);
-
-function updateCountry(){
-setBubblePlot(countrySelector.value);
-}
-
-countrySelector.addEventListener('change', updateCountry, false);
-});
-</script>-->
-
-
-<!--
-
-<div class="showcase__section" id="bubble">
-    <div class="spacer --small"></div>
-    <div id="bubbleplots">
-      <div class="bubbleplot" data-num="0">
-        <div class="plot" id="plotdiv"></div>
-        <div class="control-rowX">
-          X-axis: <select class="xdata">
-          </select>
-        </div>
-        <div class="control-rowY">
-          Y-axis: <select class="ydata">
-          </select>
-        </div>
-      </div>
-    </div>
-</div>
-
-
-
-<script>
-var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-
-function getChosenAttributesData(chosenAttributeX, chosenAttributeY) {
-currentX = [];
-currentY = [];
-for (var i = 0 ; i < attributes_list.length ; i++){
-  if ( attributes_list[i] === chosenAttributeX ) {
-    currentGdp.push(currentX[i]);
-  } 
-  if ( attributes_list[i] === chosenAttributeX ) {
-    currentGdp.push(currentX[i]);
-  } 
-}
-};
-
-countrySelector = innerContainer.querySelector('.countrydata');
-
-function assignOptions(textArray, selector) {
-for (var i = 0; i < textArray.length;  i++) {
-  var currentOption = document.createElement('option');
-  currentOption.text = textArray[i];
-  selector.appendChild(currentOption);
-}
-}
-
-assignYOptions(listofAttributes, attributesYSelector);
-assignXOptions(listofAttributes, attributesXSelector);
-
-function updateXAttributes(){
-setBubblePlot(attributesXSelector.value);
-}
-function updateYAttributes(){
-setBubblePlot(attributesYSelector.value);
-}
-
-attributesYSelector.addEventListener('change', updateYAttributes, false);
-attributesXSelector.addEventListener('change', updateXAttributes, false);
-</script>
--->
+  </script></div>
 
 </body>
 
     {% endblock %}
-
-
 
