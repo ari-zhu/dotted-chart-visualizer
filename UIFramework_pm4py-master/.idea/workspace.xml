@@ -48,7 +48,7 @@
     <property name="RunOnceActivity.ShowReadmeOnStart" value="true" />
     <property name="SHARE_PROJECT_CONFIGURATION_FILES" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
-    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../../../SCandML/skml-abgabe" />
     <property name="settings.editor.selected.configurable" value="project.propVCSSupport.Mappings" />
   </component>
   <component name="PyConsoleOptionsProvider">
@@ -134,7 +134,9 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1592818959666</updated>
-      <workItem from="1622541711722" duration="2184000" />
+      <workItem from="1622541711722" duration="4180000" />
+      <workItem from="1622656949863" duration="630000" />
+      <workItem from="1622791683741" duration="9355000" />
     </task>
     <task id="LOCAL-00001" summary="EventLog Modification">
       <created>1592984075348</created>
