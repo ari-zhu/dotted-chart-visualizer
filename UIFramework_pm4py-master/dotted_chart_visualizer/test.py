@@ -14,8 +14,8 @@ def selection(selection_dict):
             complete = True
     return axes_only, complete, selection_list
 
-#def getAttribute(df, attributeName):
-    #return df[attributeName].tolist()
+def to_set(list):
+    return [i for j, i in enumerate(list) if i not in list[:j]]
 
 
 def data_points(df, attr_dict):
@@ -30,9 +30,9 @@ def data_points(df, attr_dict):
         yaxis_list = []
         labels_list[2], labels_list[3] = [selection_list[2], selection_list[3]]
         color_values = df[selection_list[2]].tolist()
-        color_values_set = [i for j, i in enumerate(color_values) if i not in color_values[:j]]
+        color_values_set = to_set(color_values)
         shape_values = df[selection_list[3]].tolist()
-        shape_values_set = [i for j, i in enumerate(shape_values) if i not in shape_values[:j]]
+        shape_values_set = to_set(shape_values)
         df_filtered = df[selection_list]
 
         for color_value in color_values_set:
@@ -41,14 +41,30 @@ def data_points(df, attr_dict):
                             df_filtered[selection_list[3]] == shape_value)][selection_list[0]].values.tolist())
                 yaxis_list.append(df_filtered.loc[(df_filtered[selection_list[2]] == color_value) & (
                             df_filtered[selection_list[3]] == shape_value)][selection_list[1]].values.tolist())
-                # print(df_filtered.loc[(df_filtered[selection_list[2]] == color_value) & (df_filtered[selection_list[3]] == shape_value)])
-                # print(yaxis_list)
-                # print(shape_values_set)
-                # print(color_values_set)
-                data_points_list = [xaxis_list, yaxis_list]
-        # print(selection_list)
+
+        data_points_list = [xaxis_list, yaxis_list]
         legend_list = [color_values_set, shape_values_set]
         return labels_list, data_points_list, legend_list
+
+    else:
+        if selection_list[2] is not None:
+            values_set = to_set(df[selection_list[2]].tolist())
+            legend_list = [values_set, None]
+            labels_list[2] = selection_list[2]
+            selection_list = selection_list[:3]
+        else:
+            values_set = to_set(df[selection_list[3]].tolist())
+            legend_list = [None, values_set]
+            labels_list[3] = selection_list[3]
+            selection_list = selection_list[:2] + [selection_list[3]]
+
+        xaxis_list = []
+        yaxis_list = []
+        df_filtered = df[selection_list]
+        for value in values_set:
+            xaxis_list.append(df_filtered.loc[df_filtered[selection_list[2]] == value][selection_list[0]].values.tolist())
+            yaxis_list.append(df_filtered.loc[df_filtered[selection_list[2]] == value][selection_list[1]].values.tolist())
+        return labels_list, [xaxis_list, yaxis_list, legend_list], legend_list
 
 
 
