@@ -2,7 +2,7 @@ import pandas as pd
 def selection(selection_dict):
     selection_list = [selection_dict["xaxis_choice"], selection_dict["yaxis_choice"], None, None]
     axes_only = True
-    complete = True #TODO: change when 3/4 attributes selected implemented
+    complete = False
     if selection_dict["color_choice"] != "Choose here":
         selection_list[2] = selection_dict["color_choice"]
         axes_only = False
