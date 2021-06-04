@@ -10,7 +10,7 @@ def selection(selection_dict):
     if selection_dict["shape_choice"] != "Choose here":
         selection_list[3] = selection_dict["shape_choice"]
         axes_only = False
-        if selection_list[2] != None:
+        if selection_list[2] is not None:
             complete = True
     return axes_only, complete, selection_list
 
