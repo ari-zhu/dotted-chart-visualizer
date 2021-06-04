@@ -64,7 +64,7 @@ def data_points(df, attr_dict):
         for value in values_set:
             xaxis_list.append(df_filtered.loc[df_filtered[selection_list[2]] == value][selection_list[0]].values.tolist())
             yaxis_list.append(df_filtered.loc[df_filtered[selection_list[2]] == value][selection_list[1]].values.tolist())
-        return labels_list, [xaxis_list, yaxis_list, legend_list], legend_list
+        return labels_list, [xaxis_list, yaxis_list], legend_list
 
 
 
