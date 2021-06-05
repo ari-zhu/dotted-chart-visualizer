@@ -123,3 +123,43 @@ def setDefault(df):
         y_column = df[y_label]
 
     return x_column, y_column, x_label, y_label
+
+def get_unique_values (df, col_name):
+    return df[col_name].unique()
+
+def get_Colored_Values (df, color_att, color_val, target_att):
+    #filter rows where color_att is equal to color_val
+    df_color = df.loc [df[color_att] == color_val]
+    #reduce to target column
+    df_color_col = df_color [target_att]
+    #convert to list
+    return list(df_color_col.values.tolist())
+
+#returns a list of lists where each inner list is the values of the column specified by target index
+#where the values of this column are equal to a unique value of the color column
+def get_Colored_Col (df, color_att, target_att):
+    unique_vals = get_unique_values(df, color_att)
+    col_list = []
+    for val in unique_vals:
+        val_list = get_Colored_Values(df, color_att, val, target_att)
+        col_list.append(val_list)
+    return col_list
+
+def get_Colored_And_Shaped_Values (df, color_att, color_val, shaped_att, shaped_val, target_att):
+    #filter rows where color_att is equal to color_val
+    df_color = df.loc [df[color_att] == color_val]
+    df_color_shape = df_color.loc [df_color[shaped_att] == shaped_val]
+    #reduce to target column
+    target_col = df_color_shape [target_att]
+    #convert to list
+    return list(target_col.values.tolist())
+
+def get_Colored_AND_Shaped(df, color_att, shaped_att, target_att):
+    unique_colored = get_unique_values(df, color_att)
+    unique_shaped = get_unique_values(df, shaped_att)
+    res_list = []
+    for u in unique_colored:
+        for v in unique_shaped:
+            val_list = get_Colored_And_Shaped_Values(df, color_att, u, shaped_att, v, target_att)
+            res_list.append(val_list)
+    return res_list
