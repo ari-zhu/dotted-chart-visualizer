@@ -19,8 +19,6 @@
 
 <!-- Dropdown menu selections -->
 <br>
-<div class="row">
-  <div class=" col-sm-6 col-md-7 col-lg-8">
     <form  name="choice" action="" method = "POST">
       {% csrf_token %}
         <p>X-axis:</p>
@@ -61,39 +59,19 @@
           {% endfor %}
         </select>
 
-        <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+        <button title="Set as the input" type = "submit" value = "Set" name= "setButton" id ='setButton' onclick="drawSomething(); return false;">Set</button>
 
     </form>
-  </div>
-</div>
 <br>
-
+<div id="tester"></div>
 <script> 
-    var default_axis = {{ default_axis_list|safe }};
-    var default_x = default_axis[0];
-    var default_y = default_axis[1];
-    //var default_x = {{ default_x_axis_list|safe }};
-    //var default_y = {{ default_y_axis_list|safe }};
-    //for (int i = 0, i<default_axis.length, i++)
-    //{
-        //if(chosen_x_axis == attributes_list[i])
-        //{
-          //var default_x = default_axis[i];
-        //}
-        //if(chosen_y_axis == attributes_list[i])
-        //{
-          //var default_y = default_axis[i];
-        //}
-    //}
-    var default_label = {{default_label_list|safe}};
-</script> 
-
-
-
-
-<div id='myDiv'>
-    <script>
-    var trace1 = {
+function drawDefault()
+{
+  var default_axis = {{ default_axis_list|safe }};
+  var default_x = default_axis[0];
+  var default_y = default_axis[1];
+  var default_label = {{ default_label_list|safe}};
+  var trace1 = {
     x: default_x,
     y: default_y,
     mode: 'markers',
@@ -103,17 +81,48 @@
 
   var layout = {
     showlegend: false,
-    xaxis: { type: 'category', title: default_label[0]},
-    yaxis: { type: 'category', title: default_label[1], automargin: true}
+    xaxis: { type: 'category' },
+    yaxis: { type: 'category',  automargin: true}
   };
   
   var data = [ trace1 ];
+
+  Plotly.react("tester", data, layout)
+}
+</script>
+<script>
+function drawSomething()
+{
+  //var axis_values = {{ axis_list|safe }};
+  //var x_values = axis_values[0];
+  //var y_values = axis_values[1];
+  var trace1 = {
+    x: ['1'],
+    y: ['a'],
+    mode: 'markers',
+    type: 'scatter',
+    marker: { size: 12 }
+  };
+
+  var layout = {
+    showlegend: false,
+    xaxis: { type: 'category' },
+    yaxis: { type: 'category',  automargin: true}
+  };
   
-  Plotly.newPlot('myDiv', data, layout);
-  
-  </script></div>
+  var data = [ trace1 ];
+
+  Plotly.react("tester", data, layout)
+}
+</script>
+
+{% if default_try == False %}
+  <p>Changed {{default_try}}</p>
+{% else %}
+  <p>Default </p>
+  <script>drawDefault();</script>
+{% endif %}
 
 </body>
 
     {% endblock %}
-
