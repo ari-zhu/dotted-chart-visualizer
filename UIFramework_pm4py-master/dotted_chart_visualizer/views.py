@@ -31,7 +31,7 @@ def dcv(request):
             selection_dict.pop('csrfmiddlewaretoken')
             selection_dict.pop('setButton')
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list})
+            return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list, 'default_try': default_try})
             #return HttpResponse(json.dumps(axis_list)+"labels:"+json.dumps(label_list))
             #return HttpResponse(json.dumps(label_list))
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
@@ -48,7 +48,7 @@ def dcv(request):
                 default_label_list = [default_x_axis_label, default_y_axis_label]
                 #log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
                 return render(request, 'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list, 'default_label_list': default_label_list,
-                                                'attribute_list': log_attribute_list})
+                                                'attribute_list': log_attribute_list, 'default_try': default_try})
             else:
                 message = "file not valid or separator in CSV file not recognized"
                 return render(request, 'dcv.html', {'error_message': message})
