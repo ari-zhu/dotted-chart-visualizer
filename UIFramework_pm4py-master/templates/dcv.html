@@ -119,6 +119,7 @@
 <br>
 <div id="tester"></div>
 <script> 
+<script> 
 function drawDefault()
 {
   var default_axis = {{ default_axis_list|safe }};
@@ -130,13 +131,13 @@ function drawDefault()
     y: default_y,
     mode: 'markers',
     type: 'scatter',
-    marker: { size: 12 }
+    marker: { size: 12, shape: 'square' }
   };
 
   var layout = {
     showlegend: false,
-    xaxis: { type: 'category' },
-    yaxis: { type: 'category',  automargin: true}
+    xaxis: { type: 'category', title: default_label[0] },
+    yaxis: { type: 'category', title: default_label[1], automargin: true}
   };
   
   var data = [ trace1 ];
@@ -150,21 +151,209 @@ function drawSomething(){
   var axis_values = {{axis_list|safe }};
   var x_values = axis_values[0];
   var y_values = axis_values[1];
-  var trace1 = {
-    x: x_values,//['a'],
-    y: y_values,//['b'],
-    mode: 'markers',
-    type: 'scatter',
-    marker: { size: 12 }
-  };
+  var chosen = {{label_list|safe}};
+  var legend_list = {{legend_list|safe}};
+  var possible_colors =['rgb(255, 0, 0)','rgb(255, 128, 0)','rgb(255, 255, 0)',
+    'rgb(128, 255, 0)','rgb(0, 255, 255)','rgb(0, 128, 255)','rgb(0, 0, 255)',
+    'rgb(128, 0, 255)','rgb(255, 0, 255)','rgb(255, 0, 128)','rgb(128, 128, 128)'];
+  if((!chosen[2])&&!(chosen[3]))
+  {
+    var trace1 = {
+      x: x_values,//['a'],
+      y: y_values,//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: {size: 12}
+    };
 
-  var layout = {
-    showlegend: false,
-    xaxis: { type: 'category' },
-    yaxis: { type: 'category',  automargin: true}
-  };
+    var layout = {
+      showlegend: false,
+      xaxis: { type: 'category', title: chosen[0] },
+      yaxis: { type: 'category', title: chosen[0], automargin: true}
+    };
   
-  var data = [ trace1 ];
+    var data = [ trace1 ];
+  }
+  else if(chosen[2])
+  {
+    //var data = [];
+    //for (var i = 0; i < 8; ++i) {
+    //  var data[i] = {
+    //    x: x_values[i],//['a'],
+    //    y: y_values[i],//['b'],
+    //    mode: 'markers',
+    //    type: 'scatter',
+    //    marker: { size: 12, color: possible_colors[i] }
+    //  };
+    //}
+    var trace0 = {
+      x: x_values[0],//['a'],
+      y: y_values[0],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[0] },
+      name: legend_list[0]
+    };
+    var trace1 = {
+      x: x_values[1],//['a'],
+      y: y_values[1],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[1] },
+      name: legend_list[1]
+    };
+    var trace2 = {
+      x: x_values[2],//['a'],
+      y: y_values[2],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[2] },
+      name: legend_list[2]
+    };
+    var trace3 = {
+      x: x_values[3],//['a'],
+      y: y_values[3],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[3] },
+      name: legend_list[3]
+    };
+    var trace4 = {
+      x: x_values[4],//['a'],
+      y: y_values[4],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[4] },
+      name: legend_list[4]
+    };
+    var trace5 = {
+      x: x_values[5],//['a'],
+      y: y_values[5],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[5] },
+      name: legend_list[5]
+    };
+    var trace6 = {
+      x: x_values[6],//['a'],
+      y: y_values[6],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[6] },
+      name: legend_list[6]
+    };
+    var trace7 = {
+      x: x_values[7],//['a'],
+      y: y_values[7],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[7] },
+      name: legend_list[7]
+    };
+
+    var layout = {
+      showlegend: true,
+      xaxis: { type: 'category', title: chosen[0] },
+      yaxis: { type: 'category', title: chosen[1], automargin: true}
+    };
+    var data = [trace0, trace1, trace2, trace3, trace4, trace5, trace6, trace7];
+  //var data = [];
+  //for(var i = 0; i < x_values.length; ++i)
+  //{
+    //data.push(trace+i);
+  //};
+
+  }
+  else if(chosen[3])
+  {
+    //var data = [];
+    //for (var i = 0; i < 8; ++i) {
+    //  var data[i] = {
+    //    x: x_values[i],//['a'],
+    //    y: y_values[i],//['b'],
+    //    mode: 'markers',
+    //    type: 'scatter',
+    //    marker: { size: 12, color: possible_colors[i] }
+    //  };
+    //}
+    var trace0 = {
+      x: x_values[0],//['a'],
+      y: y_values[0],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[0] },
+      name: legend_list[0]
+    };
+    var trace1 = {
+      x: x_values[1],//['a'],
+      y: y_values[1],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[1] },
+      name: legend_list[1]
+    };
+    var trace2 = {
+      x: x_values[2],//['a'],
+      y: y_values[2],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[2] },
+      name: legend_list[2]
+    };
+    var trace3 = {
+      x: x_values[3],//['a'],
+      y: y_values[3],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[3] },
+      name: legend_list[3]
+    };
+    var trace4 = {
+      x: x_values[4],//['a'],
+      y: y_values[4],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[4] },
+      name: legend_list[4]
+    };
+    var trace5 = {
+      x: x_values[5],//['a'],
+      y: y_values[5],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[5] },
+      name: legend_list[5]
+    };
+    var trace6 = {
+      x: x_values[6],//['a'],
+      y: y_values[6],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[6] },
+      name: legend_list[6]
+    };
+    var trace7 = {
+      x: x_values[7],//['a'],
+      y: y_values[7],//['b'],
+      mode: 'markers',
+      type: 'scatter',
+      marker: { size: 12, color: possible_colors[7] },
+      name: legend_list[7]
+    };
+
+    var layout = {
+      showlegend: true,
+      xaxis: { type: 'category', title: chosen[0] },
+      yaxis: { type: 'category', title: chosen[1], automargin: true}
+    };
+    var data = [trace0, trace1, trace2, trace3, trace4, trace5, trace6, trace7];
+  //var data = [];
+  //for(var i = 0; i < x_values.length; ++i)
+  //{
+    //data.push(trace+i);
+  //};
+
+  }
 
   Plotly.react("tester", data, layout)
 }
