@@ -20,7 +20,7 @@ def to_set(list):
 
 def data_points(df, attr_dict):
     axes_only, complete, selection_list = selection(attr_dict)
-    labels_list = [selection_list[0], selection_list[1]]
+    labels_list = [selection_list[0], selection_list[1], 'Choose here', 'Choose here']
 
     if axes_only:
         data_points_list = [df[selection_list[0]].tolist(), df[selection_list[1]].tolist()]
@@ -28,8 +28,7 @@ def data_points(df, attr_dict):
     elif complete:
         xaxis_list = []
         yaxis_list = []
-        labels_list.append(selection_list[2])
-        labels_list.append(selection_list[3])
+        labels_list[2], labels_list[3] = selection_list[2], selection_list[3]
         color_values = df[selection_list[2]].tolist()
         color_values_set = to_set(color_values)
         shape_values = df[selection_list[3]].tolist()
@@ -51,14 +50,12 @@ def data_points(df, attr_dict):
         if selection_list[2] is not None:
             values_set = to_set(df[selection_list[2]].tolist())
             legend_list = [values_set]
-            labels_list.append(selection_list[2])
-            labels_list.append('Choose here')
+            labels_list[2] = selection_list[2]
             selection_list = selection_list[:3]
         else:
             values_set = to_set(df[selection_list[3]].tolist())
             legend_list = [values_set]
-            labels_list.append('Choose here')
-            labels_list.append(selection_list[3])
+            labels_list[3] = selection_list[3]
             selection_list = selection_list[:2] + [selection_list[3]]
 
         xaxis_list = []
