@@ -25,41 +25,91 @@
       {% csrf_token %}
         <p>X-axis:</p>
         <select name="xaxis_choice">
-          {% for attr in attribute_list %}
-            {% if attr ==  default_label_list.0 %}
-              <option value="{{attr}}" selected>{{attr}}</option>
-            {% else %}
-              <option value="{{attr}}">{{attr}}</option>
-            {% endif %}
-          {% endfor %}
+
+          {% if default_label_list %}
+            {% for attr in attribute_list %}
+              {% if attr ==  default_label_list.0 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if label_list %}
+            {% for attr in attribute_list %}
+              {%if attr == label_list.0 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
         </select>
 
         <p>Y-axis:</p>
         <select name="yaxis_choice">
-          {% for attr in attribute_list %}
-            {% if attr ==  default_label_list.1 %}
-              <option value="{{attr}}" selected>{{attr}}</option>
-            {% else %}
-              <option value="{{attr}}">{{attr}}</option>
-            {% endif %}
-          {% endfor %}
+          {% if default_label_list %}
+            {% for attr in attribute_list %}
+              {% if attr ==  default_label_list.1 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% else %}}
+            {% for attr in attribute_list %}
+              {%if attr == label_list.1 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         </select>
 
         <p>Color:</p>
         <select name="color_choice">
-          <option selected hidden>Choose here</option>
-          {% for attr in attribute_list %}
-            <option value="{{attr}}">{{attr}}</option>
-          {% endfor %}
+          {% if default_label_list %}
+            <option selected hidden>Choose here</option>
+            {% for attr in attribute_list %}
+             <option value="{{attr}}">{{attr}}</option>
+            {% endfor %}
+          {% else %}
+            {% if label_list.2 == "Choose here" %}
+                <option selected hidden>Choose here</option>
+            {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.2 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
         </select>
 
         <p>Shape:</p>
         <select name="shape_choice">
-          <option selected hidden>Choose here</option>
-          {% for attr in attribute_list %}
-            <option value="{{attr}}">{{attr}}</option>
-          {% endfor %}
-        </select>
+          {% if default_label_list %}
+            <option selected hidden>Choose here</option>
+            {% for attr in attribute_list %}
+             <option value="{{attr}}">{{attr}}</option>
+            {% endfor %}
+          {% else %}
+            {% if label_list.3 == "Choose here" %}
+                <option selected hidden>Choose here</option>
+            {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.3 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
 
         <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
 

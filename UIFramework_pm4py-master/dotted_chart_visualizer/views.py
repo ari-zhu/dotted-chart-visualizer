@@ -27,7 +27,6 @@ def dcv(request):
         log_attribute_list = getAttributeNames(log_df)
 
         if request.method == 'POST':
-            #if request.GET["color_choice"] != "Choose here":
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
             selection_dict.pop('csrfmiddlewaretoken')
             selection_dict.pop('setButton')
