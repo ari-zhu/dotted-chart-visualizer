@@ -20,7 +20,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="eed136c0-84eb-4345-a123-4cb2c46ab4af" name="Default" comment="EventLog Modification">
-      <change beforePath="$PROJECT_DIR$/../Tests/event_log_to_df.ipynb" beforeDir="false" afterPath="$PROJECT_DIR$/../Tests/event_log_to_df.ipynb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../Tests/event_log_to_df.ipynb" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -136,7 +136,7 @@
       <updated>1592818959666</updated>
       <workItem from="1622541711722" duration="4180000" />
       <workItem from="1622656949863" duration="630000" />
-      <workItem from="1622791683741" duration="20792000" />
+      <workItem from="1622791683741" duration="33155000" />
     </task>
     <task id="LOCAL-00001" summary="EventLog Modification">
       <created>1592984075348</created>

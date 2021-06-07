@@ -27,15 +27,18 @@ def dcv(request):
         log_attribute_list = getAttributeNames(log_df)
 
         if request.method == 'POST':
+            #if request.GET["color_choice"] != "Choose here":
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
             selection_dict.pop('csrfmiddlewaretoken')
             selection_dict.pop('setButton')
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
+            default_try = False
+                #return HttpResponse(json.dumps(selection_dict))
             return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list, 'default_try': default_try})
-            #return HttpResponse(json.dumps(axis_list)+"labels:"+json.dumps(label_list))
+            #return HttpResponse(json.dumps(data_list)+"labels:"+json.dumps(label_list))
             #return HttpResponse(json.dumps(label_list))
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
-            #return HttpResponse(json.dumps(selection_dict))
+           # return HttpResponse(json.dumps(selection_dict))
 
 
 
@@ -46,12 +49,14 @@ def dcv(request):
                 default_y_axis_list = default_y_axis_df.values.tolist()
                 default_axis_list = [default_x_axis_list, default_y_axis_list]
                 default_label_list = [default_x_axis_label, default_y_axis_label]
+                default_try= True
                 #log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
+
                 return render(request, 'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list, 'default_label_list': default_label_list,
                                                 'attribute_list': log_attribute_list, 'default_try': default_try})
             else:
                 message = "file not valid or separator in CSV file not recognized"
-                return render(request, 'dcv.html', {'error_message': message})
+                return render(request, 'dcv_test.html', {'error_message': message})
 
     #error message if no event log was selected:
     else:
