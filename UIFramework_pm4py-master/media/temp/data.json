@@ -6,36 +6,36 @@
         },
         {
             "id": "node_1",
-            "label": "reinitiate request"
+            "label": "decide"
         },
         {
             "id": "node_2",
-            "label": "examine thoroughly"
-        },
-        {
-            "id": "node_3",
-            "label": "register request"
-        },
-        {
-            "id": "node_4",
-            "label": "pay compensation"
-        },
-        {
-            "id": "node_5",
-            "label": "check ticket"
-        },
-        {
-            "id": "node_6",
             "label": "reject request"
         },
         {
+            "id": "node_3",
+            "label": "reinitiate request"
+        },
+        {
+            "id": "node_4",
+            "label": "examine thoroughly"
+        },
+        {
+            "id": "node_5",
+            "label": "pay compensation"
+        },
+        {
+            "id": "node_6",
+            "label": "register request"
+        },
+        {
             "id": "node_7",
-            "label": "decide"
+            "label": "check ticket"
         }
     ],
     "edges": [
         {
-            "from": "node_3",
+            "from": "node_6",
             "to": "node_0",
             "data": {
                 "freq": 3
@@ -43,55 +43,55 @@
         },
         {
             "from": "node_0",
-            "to": "node_5",
-            "data": {
-                "freq": 4
-            }
-        },
-        {
-            "from": "node_5",
             "to": "node_7",
             "data": {
-                "freq": 6
+                "freq": 4
             }
         },
         {
             "from": "node_7",
             "to": "node_1",
             "data": {
-                "freq": 3
+                "freq": 6
             }
         },
         {
             "from": "node_1",
-            "to": "node_2",
-            "data": {
-                "freq": 1
-            }
-        },
-        {
-            "from": "node_2",
-            "to": "node_5",
-            "data": {
-                "freq": 2
-            }
-        },
-        {
-            "from": "node_7",
-            "to": "node_4",
+            "to": "node_3",
             "data": {
                 "freq": 3
             }
         },
         {
             "from": "node_3",
-            "to": "node_5",
+            "to": "node_4",
+            "data": {
+                "freq": 1
+            }
+        },
+        {
+            "from": "node_4",
+            "to": "node_7",
             "data": {
                 "freq": 2
             }
         },
         {
-            "from": "node_5",
+            "from": "node_1",
+            "to": "node_5",
+            "data": {
+                "freq": 3
+            }
+        },
+        {
+            "from": "node_6",
+            "to": "node_7",
+            "data": {
+                "freq": 2
+            }
+        },
+        {
+            "from": "node_7",
             "to": "node_0",
             "data": {
                 "freq": 2
@@ -99,49 +99,49 @@
         },
         {
             "from": "node_0",
-            "to": "node_7",
+            "to": "node_1",
             "data": {
                 "freq": 2
             }
         },
         {
-            "from": "node_3",
-            "to": "node_2",
+            "from": "node_6",
+            "to": "node_4",
             "data": {
                 "freq": 1
             }
         },
         {
-            "from": "node_7",
-            "to": "node_6",
+            "from": "node_1",
+            "to": "node_2",
             "data": {
                 "freq": 3
             }
         },
         {
-            "from": "node_1",
-            "to": "node_5",
+            "from": "node_3",
+            "to": "node_7",
             "data": {
                 "freq": 1
             }
         },
         {
-            "from": "node_1",
+            "from": "node_3",
             "to": "node_0",
             "data": {
                 "freq": 1
             }
         },
         {
-            "from": "node_5",
-            "to": "node_2",
+            "from": "node_7",
+            "to": "node_4",
             "data": {
                 "freq": 1
             }
         },
         {
-            "from": "node_2",
-            "to": "node_7",
+            "from": "node_4",
+            "to": "node_1",
             "data": {
                 "freq": 1
             }

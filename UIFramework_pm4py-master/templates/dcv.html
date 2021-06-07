@@ -94,15 +94,15 @@ function drawDefault()
   Plotly.react("tester", data, layout)
 }
 </script>
+
 <script>
-function drawSomething()
-{
-  //var axis_values = {{ axis_list|safe }};
-  //var x_values = axis_values[0];
-  //var y_values = axis_values[1];
+function drawSomething(){
+  var axis_values = {{axis_list|safe }};
+  var x_values = axis_values[0];
+  var y_values = axis_values[1];
   var trace1 = {
-    x: ['1'],
-    y: ['a'],
+    x: x_values,
+    y: y_values,
     mode: 'markers',
     type: 'scatter',
     marker: { size: 12 }
@@ -120,10 +120,10 @@ function drawSomething()
 }
 </script>
 
-<p>{{default_try}}</p>
 
 {% if default_try == False %}
-  <p>Changed {{default_try}}</p>
+  <p>Changed</p>
+  <script>drawSomething();</script>
 {% else %}
   <p>Default </p>
   <script>drawDefault();</script>
