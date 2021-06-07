@@ -34,9 +34,9 @@ def dcv(request):
             default_try = False
                 #return HttpResponse(json.dumps(selection_dict))
             #data_list=data_list[:2]
-            #return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list, 'default_try': default_try})
+            return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list, 'default_try': default_try})
             #return HttpResponse(json.dumps(data_list)+"labels:"+json.dumps(label_list))
-            return HttpResponse(json.dumps(label_list))
+            #return HttpResponse(json.dumps(label_list))
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
            # return HttpResponse(json.dumps(selection_dict))
 
