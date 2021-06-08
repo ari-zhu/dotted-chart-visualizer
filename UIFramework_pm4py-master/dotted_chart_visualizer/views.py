@@ -10,7 +10,7 @@ from bootstrapdjango import settings
 from .filter_functions import setDefault
 from .filter_functions import convertLogToDf
 from .filter_functions import getAttributeNames
-from .test import data_points
+from .utils import data_points
 import pandas as pd
 import json
 
@@ -32,13 +32,13 @@ def dcv(request):
             selection_dict.pop('setButton')
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
             default_try = False
-                #return HttpResponse(json.dumps(selection_dict))
-            #data_list=data_list[:2]
             return render(request,'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list, 'legend_list': legend_list, 'attribute_list': log_attribute_list, 'default_try': default_try})
             #return HttpResponse(json.dumps(data_list)+"labels:"+json.dumps(label_list))
             #return HttpResponse(json.dumps(label_list))
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
-           # return HttpResponse(json.dumps(selection_dict))
+            #return HttpResponse(json.dumps(legend_list))
+            #return HttpResponse(json.dumps(selection_dict))
+
 
 
 

@@ -69,7 +69,7 @@ def delimitNumberOfEvents(df, startIndex, endIndex):
 # returns only the events of a specific trace with index traceIndex
 def getTrace (df, traceIndex):
     index = "trace " + str(traceIndex)
-    return df.loc [df['case'] == index]
+    return df.loc[df['case'] == index]
 
 #checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
 def checkCommaSeparated(df):
@@ -131,7 +131,7 @@ def get_Colored_Values (df, color_att, color_val, target_att):
     #filter rows where color_att is equal to color_val
     df_color = df.loc [df[color_att] == color_val]
     #reduce to target column
-    df_color_col = df_color [target_att]
+    df_color_col = df_color[target_att]
     #convert to list
     return list(df_color_col.values.tolist())
 
