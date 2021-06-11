@@ -10,25 +10,6 @@ from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
 import re
 
-def convertLogToDf(file_dir):
-
-    name, extension = os.path.splitext(file_dir)
-
-    if (extension == ".xes"):
-        xes_log = xes_importer_factory.apply(file_dir)
-        df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
-        return df_event_log
-
-    else: #(extension == ".csv"):
-        df_event_log = pd.read_csv(file_dir)
-        if (not checkCommaSeparated(df_event_log)):
-            separator = ';'
-            if separator in df_event_log.columns[0]:
-                df_event_log = pd.read_csv(file_dir, sep=separator)
-        return df_event_log
-
-
-
 # returns the number of events of event log df
 def getNumberOfEvents(df):
     return len(df)
@@ -55,8 +36,8 @@ def getAttribute(df, attributeIndex):
         print ("index out of bounds")
 
 # returns the event log sorted by a specific attribute, attribute index needed        
-def sortByAttribute(df, attributeIndex):
-    return df.sort_values(by = df.columns[attributeIndex])
+def sortByAttribute(df, attribute):
+    return df.sort_values(by = [attribute])
 
 # reduces the number of events of the event log down to a specific range with start and end index
 def delimitNumberOfEvents(df, startIndex, endIndex):
@@ -70,11 +51,6 @@ def delimitNumberOfEvents(df, startIndex, endIndex):
 def getTrace (df, traceIndex):
     index = "trace " + str(traceIndex)
     return df.loc[df['case'] == index]
-
-#checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
-def checkCommaSeparated(df):
-    if len ((df.columns)) != 1:
-        return True
 
 
 # returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
