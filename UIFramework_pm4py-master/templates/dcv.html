@@ -111,7 +111,37 @@
             {% endfor %}
           {% endif %}
 
+        </select>
+
+      <br>
         <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+      <br>
+
+        <label for="trace_sort">Sort Trace:</label>
+        <select onchange="this.form.submit()" id="trace_sort" name="trace_sort">
+          {% if default_label_list %}
+            <option selected hidden>Sort on original order of traces in log</option>
+            {% for attr in case_level_attributes %}
+                <option value="{{attr}}"> Sort on {{attr}} of first event</option>
+                <option value="{{attr}}"> Sort on {{attr}} of last event</option>
+            {% endfor %}
+            {% for attr in log_level_attributes %}
+                <option value="{{attr}}"> Sort on {{attr}}</option>
+            {% endfor %}
+          {% else %}
+            {% if label_list.3 == "Choose here" %}
+                <option selected hidden>Choose here</option>
+            {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.3 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </select>
+
 
     </form>
       </div>
