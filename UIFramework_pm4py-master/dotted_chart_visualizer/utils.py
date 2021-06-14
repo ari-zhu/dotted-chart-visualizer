@@ -15,8 +15,9 @@ def convertLogToDf(file_dir):
     if (extension == ".xes"):
         xes_log = xes_importer_factory.apply(file_dir)
         df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
-        log_level_attributes = ['case:'+k for k, v in xes_log.attributes.items()]
+        log_level_attributes = [attr for attr in getAttributeNames(df_event_log) if 'case:' in attr]
         case_level_attributes = [attr for attr in getAttributeNames(df_event_log) if attr not in log_level_attributes]
+        log_level_attributes = [attr[5:] for attr in log_level_attributes]
         return df_event_log, case_level_attributes, log_level_attributes
 
     else: #(extension == ".csv"):
