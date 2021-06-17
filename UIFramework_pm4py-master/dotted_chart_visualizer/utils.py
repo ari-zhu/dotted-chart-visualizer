@@ -8,6 +8,17 @@ from .filter_functions import get_unique_values as to_set
 from .filter_functions import getAttributeNames
 from .filter_functions import sortByAttribute as sort_df
 
+def extract_attr_log_level(df):
+    log_level_attributes = [attr for attr in getAttributeNames(df) if 'case' in attr]
+    return log_level_attributes
+
+def extract_attr_case_level(df, log_level_attributes):
+    case_level_attributes = [attr for attr in getAttributeNames(df) if attr not in log_level_attributes]
+    return case_level_attributes
+
+def extract_attribute_value(log_object,event,attribute):
+    pass
+
 def convertLogToDf(file_dir):
 
     name, extension = os.path.splitext(file_dir)
@@ -15,9 +26,9 @@ def convertLogToDf(file_dir):
     if (extension == ".xes"):
         xes_log = xes_importer_factory.apply(file_dir)
         df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
-        log_level_attributes = [attr for attr in getAttributeNames(df_event_log) if 'case:' in attr]
-        case_level_attributes = [attr for attr in getAttributeNames(df_event_log) if attr not in log_level_attributes]
-        log_level_attributes = [attr[5:] for attr in log_level_attributes]
+        log_level_attributes = extract_attr_log_level(df_event_log)
+        case_level_attributes = extract_attr_case_level(df_event_log,log_level_attributes)
+        #log_level_attributes = [attr[5:] for attr in log_level_attributes]
         return df_event_log, case_level_attributes, log_level_attributes
 
     else: #(extension == ".csv"):
@@ -26,7 +37,7 @@ def convertLogToDf(file_dir):
             separator = ';'
             if separator in df_event_log.columns[0]:
                 df_event_log = pd.read_csv(file_dir, sep=separator)
-        return df_event_log, getAttributeNames(df_event_log),[]
+        return df_event_log, getAttributeNames(df_event_log), extract_attr_log_level(df_event_log)
 
 #checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
 def checkCommaSeparated(df):
@@ -69,11 +80,13 @@ def data_points(df, attr_dict):
         if selection_list[2] is not None:
             labels_list[2] = selection_list[2]
             selection_list = selection_list[:3]
+            legend_list = [to_set(df, selection_list[2]).tolist(), []]
         else:
             labels_list[3] = selection_list[3]
             selection_list = selection_list[:2] + [selection_list[3]]
+            legend_list = [[], to_set(df, selection_list[2]).tolist()]
 
-        legend_list = [to_set(df, selection_list[2]).tolist()]
+        #legend_list = [to_set(df, selection_list[2]).tolist()]
         data_points_list = [get_Col_OR_Shape(df, selection_list[2], selection_list[0]),
                              get_Col_OR_Shape(df, selection_list[2], selection_list[1])]
         return labels_list, data_points_list, legend_list

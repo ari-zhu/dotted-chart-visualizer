@@ -35,14 +35,14 @@ def dcv(request):
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            else:
+
+            elif "trace_sort" in request.POST:
                 label_list, data_list, legend_list = sorted_data_points(log_df, selection_dict,selection_dict['trace_sort'])
             default_try = False
             return render(request,'dcv.html',
                               {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                                'legend_list': legend_list, 'attribute_list': log_attribute_list, 'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,'default_try': default_try})
 
-            #return HttpResponse(json.dumps(data_list)+"labels:"+json.dumps(label_list))
             #return HttpResponse(json.dumps(label_list))
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
             #return HttpResponse(json.dumps(legend_list))
