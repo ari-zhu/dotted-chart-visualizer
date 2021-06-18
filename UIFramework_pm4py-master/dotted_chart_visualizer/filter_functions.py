@@ -140,105 +140,6 @@ def get_Colored_AND_Shaped(df, color_att, shaped_att, target_att):
             res_list.append(val_list)
     return res_list
 
-#new helper functions. maybe move to utils
-def getCaseIndex(df):
-    pattern = re.compile(".*(C|c)ase.*") 
-    caseLabel = -1
-    caseIndex = None
-    caseFoundList = []
-
-    for col in df.columns:
-        match = pattern.match(col)
-    
-        if match is None:
-            pass
-        else:
-            caseLabel = match.group()
-            caseFoundList.append(caseLabel)
-     
-    if(len(caseFoundList)== 1):
-        caseIndex = df.columns.get_loc(caseLabel)
-    if(len(caseFoundList) > 1):
-        caseIndex = df.columns.get_loc("case:concept:name")
-        caseLabel = "case:concept:name"
-    if(caseIndex == -1):
-        print("ERRRRORRRRR")
-    return caseIndex
-
-def getCaseLabel(df):
-    pattern = re.compile(".*(C|c)ase.*") 
-    caseLabel = -1
-    caseIndex = None
-    caseFoundList = []
-
-    for col in df.columns:
-        match = pattern.match(col)
-    
-        if match is None:
-            pass
-        else:
-            caseLabel = match.group()
-            caseFoundList.append(caseLabel)
-     
-    if(len(caseFoundList)== 1):
-        caseIndex = df.columns.get_loc(caseLabel)
-    if(len(caseFoundList) > 1):
-        caseIndex = df.columns.get_loc("case:concept:name")
-        caseLabel = "case:concept:name"
-    if(caseIndex == -1):
-        print("ERRRRORRRRR")
-    return caseLabel
-
-def getTimeLabel(df):
-    pattern = re.compile(".*(T|t)ime.*") 
-    timeLabel = None
-    timeIndex = None
-    timeFoundList = []
-    match = None
-
-    for col in df.columns:
-        match = pattern.match(col)
-        
-        if match is None:
-            pass
-        else:
-            timeLabel = match.group()
-            timeFoundList.append(timeLabel)
-     
-    if(len(timeFoundList)== 1):
-        timeIndex = df.columns.get_loc(timeLabel)
-        timeLabel = df.columns[timeIndex]
-    if(len(timeFoundList) > 1):
-        timeIndex = df.columns.get_loc("time:timestamp")
-        timeLabel = "time:timestamp"
-    if(timeIndex == -1):
-        print("ERRRRORRRRR")
-    return timeLabel
-
-def getTimeIndex(df):
-    pattern = re.compile(".*(T|t)ime.*") 
-    timeLabel = -1
-    timeIndex = None
-    timeFoundList = []
-    match = None
-
-    for col in df.columns:
-        match = pattern.match(col)
-        
-        if match is None:
-            pass
-        else:
-            timeLabel = match.group()
-            timeFoundList.append(timeLabel)
-     
-    if(len(timeFoundList)== 1):
-        timeIndex = df.columns.get_loc(timeLabel)
-    if(len(timeFoundList) > 1):
-        timeIndex = df.columns.get_loc("time:timestamp")
-        timeLabel = "time:timestamp"
-    if(timeIndex == -1):
-        print("ERRRRORRRRR")
-    return timeIndex
 
 #Sorting Functions
 def sortByTrace(df):
@@ -250,7 +151,7 @@ def sortByTime(df):
     return df.sort_values(by = [timeLabel])
 
 def sortByFirstInTrace(df):
-    dfu = get_unique_values (df, "case")
+    dfu = get_unique_values (df, getCaseLabel(df))
     firstInTraceList = []
     for d in dfu:
         dfr = df.loc [df[getCaseLabel(df)] == d]
@@ -286,5 +187,5 @@ def convertTimeStamps(df):
         df[getTimeLabel(df)] = pd.to_datetime(df[getTimeLabel(df)])
         
 
-        
+
 
