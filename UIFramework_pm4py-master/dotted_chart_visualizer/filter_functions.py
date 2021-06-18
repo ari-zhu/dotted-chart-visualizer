@@ -9,6 +9,7 @@ from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
 import re
+import datetime
 
 # returns the number of events of event log df
 def getNumberOfEvents(df):
