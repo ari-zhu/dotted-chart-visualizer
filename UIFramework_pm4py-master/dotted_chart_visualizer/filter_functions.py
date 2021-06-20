@@ -186,6 +186,15 @@ def convertTimeStamps(df):
     timeIndex = getTimeIndex(df)
     if(isinstance(df.iloc[0,timeIndex],str)):
         df[getTimeLabel(df)] = pd.to_datetime(df[getTimeLabel(df)])
+
+#returns the values of the time column converted from date time to string 
+def convertDateTimeToString(df):
+    timeIndex = getTimeIndex(dfy)
+    strList = []
+    for v in dfy.iloc[:, timeIndex]:
+        u = v.strftime("%Y-%m-%d %H:%M:%S")
+        strList.append(u)
+    return strList
         
 
 
