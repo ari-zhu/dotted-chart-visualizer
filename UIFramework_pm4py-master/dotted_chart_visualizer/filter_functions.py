@@ -8,6 +8,7 @@ from django.http import HttpResponse
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
+from .utils import getCaseLabel, getTimeLabel, getTimeIndex
 import re
 
 # returns the number of events of event log df

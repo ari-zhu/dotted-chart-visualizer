@@ -30,22 +30,29 @@ def dcv(request):
 
         if request.method == 'POST':
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
+            print(selection_dict)
             selection_dict.pop('csrfmiddlewaretoken')
+            sort_attr, attr_level = selection_dict['trace_sort'].split(';')
 
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
-                label_list, data_list, legend_list = data_points(log_df, selection_dict)
+                label_list, data_list, legend_list, axes_list= data_points(log_df, selection_dict)
 
-            elif "trace_sort" in request.POST:
-                label_list, data_list, legend_list = sorted_data_points(log_df, selection_dict,selection_dict['trace_sort'])
+            elif sort_attr is not 'default': #TODO: split, lese ob log, wenn ja
+                label_list, data_list, legend_list, axes_list = sorted_data_points(log_df, selection_dict, sort_attr,attr_level)
             default_try = False
-            return render(request,'dcv.html',
-                              {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
-                               'legend_list': legend_list, 'attribute_list': log_attribute_list, 'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,'default_try': default_try})
 
-            #return HttpResponse(json.dumps(label_list))
+            return render(request,'dcv.html',
+                            {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
+                            'legend_list': legend_list, 'attribute_list': log_attribute_list,
+                             'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,
+                             'sort_selection': selection_dict['trace_sort'],'default_try': default_try})
+
+            #else:
+
+            #return HttpResponse()
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
-            #return HttpResponse(json.dumps(legend_list))
+            #return HttpResponse(["label list: ",label_list, "legend list ", legend_list])
             #return HttpResponse(json.dumps(request.POST))
             #return HttpResponse(json.dumps(log_level_attributes))
 

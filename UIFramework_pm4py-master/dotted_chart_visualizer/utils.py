@@ -91,7 +91,8 @@ def data_points(df, attr_dict):
                              get_Col_OR_Shape(df, selection_list[2], selection_list[1])]
         return labels_list, data_points_list, legend_list
 
-def sorted_data_points(df,attr_dict,sort_attr):
+def sorted_data_points(df,attr_dict,sort_attr,sort_level):
+
     return data_points(sort_df(df,sort_attr),attr_dict)
 
 

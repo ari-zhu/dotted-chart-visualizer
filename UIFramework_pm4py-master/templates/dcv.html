@@ -120,26 +120,40 @@
         <label for="trace_sort">Sort Trace:</label>
         <select onchange="this.form.submit()" id="trace_sort" name="trace_sort">
           {% if default_label_list %}
-            <option value = "default" selected hidden>Sort on original order of traces in log</option>
+            <option value = "default;log" selected>Sort on original order of traces in log</option>
+            <option value ="duration;log">Sort on trace duration</option>
             {% for attr in case_level_attributes %}
-                <option value="{{attr}}"> Sort on {{attr}} of first event</option>
-                <option value="{{attr}}"> Sort on {{attr}} of last event</option>
+              <option value = "{{ attr }};first" >Sort on {{ attr }} of first event</option>
+              <option value = "{{ attr}};first">Sort on {{ attr }} of last event</option>
             {% endfor %}
             {% for attr in log_level_attributes %}
-                <option value="{{attr}}"> Sort on {{attr}} of trace</option>
+               <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
             {% endfor %}
+          {% elif sort_selection == "default"%}
+            <option value = "default;log" selected>Sort on original order of traces in log</option>
+          {% elif sort_selection == "duration" %}
+            <option value = "duration;log" selected>Sort on trace duration</option>
           {% else %}
-            {% if label_list.3 == "default" %}
-                <option value ="default" selected hidden>Choose here</option>
-            {% endif %}
-            {% for attr in attribute_list %}
-              {% if attr == label_list.3 %}
-                <option value="{{attr}}" selected>{{attr}}</option>
-              {% else %}
-                <option value="{{attr}}">{{attr}}</option>
-              {% endif %}
+            {% for attr in case_level_attributes %}
+                {% if attr in  sort_selection %}
+                    {% if "first" in sort_selection %}
+                    <option value = "{{ sort_selection }}" selected>Sort on {{ attr }} of first event</option>
+                    <option value = "{{ sort_selection }}">Sort on {{ attr }} of last event</option>
+                    {% else %}
+                    <option value = "{{ sort_selection }}" selected>Sort in {{ attr }} of last event</option>
+                    <option value = "{{ sort_selection }}">Sort on {{ attr }} of last event</option>
+                    {% endif %}
+                {% endif %}
+                <option value="{{attr}};first"> Sort on {{attr}} of first event</option>
+                <option value="{{attr}};last"> Sort on {{attr}} of last event</option>
             {% endfor %}
-          {% endif %}
+            {% for attr in log_level_attributes %}
+                {% if attr in sort_selection %}
+                  <option value="{{attr}};log" selected> Sort on {{attr}} of trace</option>
+                {% endif %}
+                <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
+            {% endfor %}
+            {% endif %}
         </select>
 
 
@@ -294,9 +308,9 @@ function drawSomething(){
 
     var layout = {
       showlegend: true,
-      xaxis: { type: 'category',  /*"categoryorder": "array",
-        "categoryarray":  [3,2,1,6,5,4],*/ title: chosen[0] },
-      yaxis: { type: 'category', title: chosen[1], automargin: true}
+      xaxis: {type: 'category',  /*"categoryorder": "linear",
+        /*"categoryarray":  [3,2,1,6,5,4],*/ title: chosen[0] },
+      yaxis: { type: 'category', "categoryorder": "linear", title: chosen[1], automargin: true}
     };
     var data = [trace0 , trace1, trace2, trace3, trace4, trace5, trace6, trace7];
   //var data = [];
