@@ -167,6 +167,21 @@ def sortByLastInTrace(df):
         lastInTraceList.append(dfr.iloc[-1])
     return lastInTraceList
 
+def sortyByTraceDuration(df):
+    durationList = []
+    traceList = []
+    dfu = get_unique_values (df, getCaseIndex(df))
+    for d in dfu:
+        dfr = df.loc [df[getCaseLabel(df)] == d]
+        finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)])
+        startTime = pd.to_datetime(dfr.iloc[0][getTimeIndex(df)])
+        duration = finishTime - startTime
+        durationList.append(duration)
+        traceList.append(d)
+        trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)),columns =['trace', 'duration'])
+        td_sort = trace_duration_df.sort_values(by = 'duration', ascending = False)
+    return td_sort.values.tolist()
+
 #Converting TimeStamps
 
 def convertStringToDateTime(date_string):
@@ -221,3 +236,4 @@ def renameXesColumns(df):
                 df = df.rename(columns={col:colName})
     return df
 
+#sorts
