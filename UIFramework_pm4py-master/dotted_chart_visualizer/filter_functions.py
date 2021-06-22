@@ -196,6 +196,28 @@ def convertDateTimeToString(df):
         strList.append(u)
     return strList
         
-
-
+#renames column names to get prettier names, used for XES files
+def renameXesColumns(df):
+    df = df.rename(columns={getTimeLabel(df): "Time",getCaseLabel(df):"Case" })
+    if("org:resource" in df.columns):
+        df = df.rename(columns={"org:resource":"Resource"})
+    if("concept:name" in df.columns):
+        df = df.rename(columns={"concept:name":"Activity"})      
+    if("case:creator in df.columns"):
+        df = df.rename(columns={"case:creator":"Creator"})
+    if("lifecycle:transition" in df.columns):
+        df = df.rename(columns={"lifecycle:transition":"Lifecycle"})
+    if("case:description" in df.columns):
+        df = df.rename(columns={"case:description":"Description"})
+    for col in df.columns:
+        if "case:" in col:
+            prefix, colName = col.split(":")
+            if colName.islower():
+                firstLetter = colName[:1].upper()
+                restWord = colName.split([colName[:1]])[1]
+                res = ''.join([firstLetter, restWord]) 
+                df = df.rename(columns={colName:res})
+            else:
+                df = df.rename(columns={col:colName})
+    return df
 
