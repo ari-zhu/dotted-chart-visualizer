@@ -186,13 +186,6 @@ function drawDefault()
     type: 'scatter',
     marker: { size: 12, shape: 'square' }
   };
-  var default_axes_order = {{ default_axis_order |safe }}
-
-  var layout = {
-    showlegend: false,
-    xaxis: {'type': 'category', 'categoryorder': 'array', 'array': [1,2,4,5,6,3] ,title: default_label[0] },
-    yaxis: {'type': 'category','categoryorder': 'array', 'array': default_axes_order[1], title: default_label[1], automargin: true}
-  };
 
   var data = [ trace1 ];
 
@@ -201,6 +194,14 @@ function drawDefault()
       xaxis: { "categoryorder": "array",
         "categoryarray":  [3,5,4,6,1,2], title: default_label[0]},
       yaxis: { type: 'category', title: default_label[1], automargin: true}};*/
+
+    var default_axes_order = {{ default_axis_order |safe }}
+
+    var layout = {
+    showlegend: false,
+    xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': default_axes_order[0] ,title: default_label[0] },
+    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: default_label[1], automargin: true}
+  };
 
   Plotly.react("tester", data, layout);
 }
@@ -213,7 +214,7 @@ function drawSomething(){
   var y_values = axis_values[1];
   var chosen = {{label_list|safe}};
   var legend_list = {{legend_list|safe}};
-  var order_list ={{ axes_order|safe }}
+  var axes_order={{ axes_order|safe }}
   var legend_list_colors = legend_list[0];
   var legend_list_shapes = legend_list[1];
   var possible_colors =['rgb(255, 0, 0)','rgb(255, 128, 0)','rgb(255, 255, 0)',
@@ -353,9 +354,9 @@ function drawSomething(){
     {
       var layout = {
       showlegend: false,
-      xaxis: {title: chosen[0] },
+      xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: chosen[0] },
 
-      yaxis: { title: chosen[1], automargin: true}
+      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true}
       };
     }
 
