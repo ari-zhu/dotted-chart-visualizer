@@ -12,6 +12,7 @@ import re
 import datetime
 
 
+
 # returns the number of events of event log df
 def getNumberOfEvents(df):
     return len(df)
@@ -107,7 +108,11 @@ def setDefault(df):
         x_column = df[x_label]
         y_column = df[y_label]
 
-    return x_column, y_column, x_label, y_label
+    x_column = x_column.tolist()
+    y_column = y_column.tolist()
+    x_axis_order = get_unique_values(df, x_label).tolist()
+    y_axis_order = get_unique_values(df, y_label).tolist()[::-1]
+    return [x_column, y_column], x_label, y_label, [x_axis_order, y_axis_order]
 
 
 def get_unique_values(df, col_name):
@@ -153,6 +158,66 @@ def get_Colored_AND_Shaped(df, color_att, shaped_att, target_att):
             val_list = get_Colored_And_Shaped_Values(df, color_att, u, shaped_att, v, target_att)
             res_list.append(val_list)
     return res_list
+
+# new helper functions
+def getCaseIndex(df):
+    pattern = re.compile(".*(C|c)ase.*")
+    caseLabel = -1
+    caseIndex = None
+    caseFoundList = []
+
+    for col in df.columns:
+        match = pattern.match(col)
+
+        if match is None:
+            pass
+        else:
+            caseLabel = match.group()
+            caseFoundList.append(caseLabel)
+
+    if (len(caseFoundList) == 1):
+        caseIndex = df.columns.get_loc(caseLabel)
+    if (len(caseFoundList) > 1):
+        caseIndex = df.columns.get_loc("case:concept:name")
+        caseLabel = "case:concept:name"
+    if (caseIndex == -1):
+        print("ERRRRORRRRR")
+    return caseIndex
+
+
+def getCaseLabel(df):
+    return df.columns[getCaseIndex(df)]
+
+
+def getTimeLabel(df):
+    return df.columns[getTimeIndex(df)]
+
+
+def getTimeIndex(df):
+    pattern = re.compile(".*(T|t)ime.*")
+    timeLabel = -1
+    timeIndex = None
+    timeFoundList = []
+    match = None
+
+    for col in df.columns:
+        match = pattern.match(col)
+
+        if match is None:
+            pass
+        else:
+            timeLabel = match.group()
+            timeFoundList.append(timeLabel)
+
+    if (len(timeFoundList) == 1):
+        timeIndex = df.columns.get_loc(timeLabel)
+    if (len(timeFoundList) > 1):
+        timeIndex = df.columns.get_loc("time:timestamp")
+        timeLabel = "time:timestamp"
+    if (timeIndex == -1):
+        print("ERRRRORRRRR")
+    return timeIndex
+
 
 
 # Sorting Functions
@@ -221,13 +286,14 @@ def convertTimeStamps(df):
     timeIndex = getTimeIndex(df)
     if (isinstance(df.iloc[0, timeIndex], str)):
         df[getTimeLabel(df)] = pd.to_datetime(df[getTimeLabel(df)])
+    return df
 
 
 # returns the values of the time column converted from date time to string
 def convertDateTimeToString(df):
-    timeIndex = getTimeIndex(dfy)
+    timeIndex = getTimeIndex(df)
     strList = []
-    for v in dfy.iloc[:, timeIndex]:
+    for v in df.iloc[:, timeIndex]:
         u = v.strftime("%Y-%m-%d %H:%M:%S")
         strList.append(u)
     return strList
