@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
-    sortByTime, getTimeLabel
+    sortByTime, getTimeLabel, sortyByTraceDuration, getCaseLabel
 
 from .filter_functions import getAttributeNames
 from .utils import convertLogToDf, data_points
@@ -43,10 +43,11 @@ def dcv(request):
                 selection_dict.pop('setButton')
 
 
-            if getTimeLabel(log_df) in selection_list:
+            if getTimeLabel(log_df) in selection_list[:2]:
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
                 time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
+                #TODO convert dataframe
 
                 if selection_dict['xaxis_choice'] == t_label:
                     x_axis_order = time_values_list
@@ -55,7 +56,8 @@ def dcv(request):
                 if selection_dict['yaxis_choice'] == t_label:
                     y_axis_order = time_values_list[::-1]
                 else: y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
-
+            elif getTimeLabel(log_df) in selection_list[3:]:
+                pass #TODO: error message
 
             else:
                 x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
@@ -65,8 +67,15 @@ def dcv(request):
                 print(attr_level)
                 print(sort_attr)
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            elif sort_attr == 'duration':
-                pass
+            elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
+                case_label = getCaseLabel(log_df)
+                trace = sortyByTraceDuration(log_df)
+                #provisorisch:
+                trace_id_list = [a[0] for a in trace]
+                if selection_dict['xaxis_choice'] == case_label:
+                    x_axis_order = trace_id_list
+                if selection_dict['yaxis_choice'] == case_label:
+                    y_axis_order = trace_id_list[::-1]
             else:
                 pass
             default_try = False
