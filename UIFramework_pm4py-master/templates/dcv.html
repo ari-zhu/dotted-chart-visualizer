@@ -288,17 +288,17 @@ function drawSomething(){
   else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))
   {
     var data = [];
-    for (var i = 0; i <= 63; ++i) {
+    for (var i = 0; i <= (x_values.length-1); ++i) {
       var j = {
         x: x_values[i],//['a'],
         y: y_values[i],//['b'],
         mode: 'markers',
         type: 'scatter',
-        name: legend_list_colors[(i%8)] + ', ' + legend_list_shapes[Math.floor(i/8)],
+        name: legend_list_colors[(i%(legend_list_shapes.length))] + ', ' + legend_list_shapes[Math.floor(i/(legend_list_colors.length))],
         marker: {
           size: 12,
-          color: possible_colors[(i%8)],
-          symbol: possible_shapes[Math.floor(i/8)],
+          color: possible_colors[(i%(legend_list_shapes.length))],
+          symbol: possible_shapes[Math.floor(i/(legend_list_colors.length))],
           line: { color: 'rgb(255,255,255)', width: 1}
         }
       };
@@ -355,7 +355,7 @@ function drawSomething(){
     else
     {
       var layout = {
-      showlegend: false,
+      showlegend: true,
       xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: chosen[0] },
       yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true}
       };
