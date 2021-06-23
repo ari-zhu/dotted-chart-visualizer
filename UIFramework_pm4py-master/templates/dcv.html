@@ -120,26 +120,49 @@
         <label for="trace_sort">Sort Trace:</label>
         <select onchange="this.form.submit()" id="trace_sort" name="trace_sort">
           {% if default_label_list %}
-            <option value = "default" selected hidden>Sort on original order of traces in log</option>
+            <option value = "default;log" selected hidden>Sort on original order of traces in log</option>
+              <option vale ="default;log">Sort on duration of traces</option>
             {% for attr in case_level_attributes %}
-                <option value="{{attr}}"> Sort on {{attr}} of first event</option>
-                <option value="{{attr}}"> Sort on {{attr}} of last event</option>
+                <option value="{{attr}};first"> Sort on {{attr}} of first event</option>
+                <option value="{{attr}};last"> Sort on {{attr}} of last event</option>
             {% endfor %}
             {% for attr in log_level_attributes %}
-                <option value="{{attr}}"> Sort on {{attr}} of trace</option>
+                <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
             {% endfor %}
           {% else %}
-            {% if label_list.3 == "default" %}
-                <option value ="default" selected hidden>Choose here</option>
+            {% if sort_attr == "default"%}
+                <option value ="{{ sort_attr }};log" selected>Sort on original order of traces in log</option>
+                <option value = "duration;log">Sort on duration of trace</option>
+            {% elif sort_attr == "duration" %}
+                <option value = "{{ sort_attr }};log" selected>Sort on duration of trace</option>
+                <option value ="default;log">Sort on original order of traces in log</option>
+            {% else %}
+                <option value ="default;log" >Sort on original order of traces in log</option>
+                <option value = duration;log">Sort on duration of trace</option>
             {% endif %}
-            {% for attr in attribute_list %}
-              {% if attr == label_list.3 %}
-                <option value="{{attr}}" selected>{{attr}}</option>
-              {% else %}
-                <option value="{{attr}}">{{attr}}</option>
-              {% endif %}
-            {% endfor %}
-          {% endif %}
+
+            {% for attr in case_level_attributes %}
+                 {% if attr == sort_attr %}
+                      {% if attr_level == 'first' %}
+                          <option value="{{ attr }};first" selected>Sort on {{ attr }} of first event</option>
+                          <option value="{{ attr }};last" >Sort on {{ attr }} of last event</option>
+                      {% else %}
+                           <option value="{{ attr }};last" selected>Sort on {{ attr }} of last event</option>
+                           <option value="{{ attr }};first">Sort on {{ attr }} of first event</option>
+                      {% endif %}
+                 {% else %}
+                        <option value="{{ attr }};last">Sort on {{ attr }} of last event</option>
+                        <option value="{{ attr }};first">Sort on {{ attr }} of first event</option>
+                    {% endif %}
+              {% endfor %}
+
+            {% for attr in log_level_attributes %}
+                {% if sort_attr == attr%}
+                    <option value="{{ attr }};log" selected>Sort on {{ attr }} of log</option>
+                {% endif %}
+                    <option value = "{{ attr }};log">Sort on {{ attr }} of log</option>
+              {% endfor %}
+            {% endif %}
         </select>
 
 
@@ -163,11 +186,12 @@ function drawDefault()
     type: 'scatter',
     marker: { size: 12, shape: 'square' }
   };
+  var default_axes_order = {{ default_axis_order |safe }}
 
   var layout = {
     showlegend: false,
-    xaxis: { title: default_label[0] },
-    yaxis: { title: default_label[1], automargin: true}
+    xaxis: {'type': 'category', 'categoryorder': 'array', 'array': [1,2,4,5,6,3] ,title: default_label[0] },
+    yaxis: {'type': 'category','categoryorder': 'array', 'array': default_axes_order[1], title: default_label[1], automargin: true}
   };
 
   var data = [ trace1 ];
@@ -189,6 +213,7 @@ function drawSomething(){
   var y_values = axis_values[1];
   var chosen = {{label_list|safe}};
   var legend_list = {{legend_list|safe}};
+  var order_list ={{ axes_order|safe }}
   var legend_list_colors = legend_list[0];
   var legend_list_shapes = legend_list[1];
   var possible_colors =['rgb(255, 0, 0)','rgb(255, 128, 0)','rgb(255, 255, 0)',
@@ -328,9 +353,8 @@ function drawSomething(){
     {
       var layout = {
       showlegend: false,
-      xaxis: {
-        title: chosen[0],
-      },
+      xaxis: {title: chosen[0] },
+
       yaxis: { title: chosen[1], automargin: true}
       };
     }
