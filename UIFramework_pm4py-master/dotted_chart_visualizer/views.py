@@ -44,6 +44,7 @@ def dcv(request):
 
 
             if getTimeLabel(log_df) in selection_list[:2]:
+                print('its a timestamps!')
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
                 time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
@@ -76,10 +77,12 @@ def dcv(request):
                     x_axis_order = trace_id_list
                 if selection_dict['yaxis_choice'] == case_label:
                     y_axis_order = trace_id_list[::-1]
+
             else:
                 pass
             default_try = False
             axes_order = [x_axis_order, y_axis_order]
+            label_list, data_list, legend_list = data_points(log_df, selection_dict)
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
