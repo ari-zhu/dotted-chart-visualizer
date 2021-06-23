@@ -8,10 +8,12 @@ from os.path import isfile, join
 from django.http import HttpResponseRedirect
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
-from .filter_functions import setDefault
+from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
+    sortByTime, getTimeLabel, sortyByTraceDuration, getCaseLabel
+
 from .filter_functions import getAttributeNames
-from .utils import convertLogToDf
-from .utils import data_points
+from .utils import convertLogToDf, data_points
+
 from .utils import sorted_data_points
 import pandas as pd
 import json
@@ -30,22 +32,66 @@ def dcv(request):
 
         if request.method == 'POST':
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
+            print(selection_dict)
             selection_dict.pop('csrfmiddlewaretoken')
+            sort_attr, attr_level = selection_dict['trace_sort'].split(';')
+            selection_dict.pop('trace_sort')
+            selection_list = [v for k, v in selection_dict.items()]
+            print(selection_list)
 
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
+
+
+            if getTimeLabel(log_df) in selection_list[:2]:
+                t_label = getTimeLabel(log_df)
+                log_df_time_sorted = sortByTime(log_df)
+                time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
+                #TODO convert dataframe
+
+                if selection_dict['xaxis_choice'] == t_label:
+                    x_axis_order = time_values_list
+                else: x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
+
+                if selection_dict['yaxis_choice'] == t_label:
+                    y_axis_order = time_values_list[::-1]
+                else: y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
+            elif getTimeLabel(log_df) in selection_list[3:]:
+                pass #TODO: error message
+
+            else:
+                x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
+                y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
+
+            if sort_attr == 'default':
+                print(attr_level)
+                print(sort_attr)
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-
-            elif "trace_sort" in request.POST:
-                label_list, data_list, legend_list = sorted_data_points(log_df, selection_dict,selection_dict['trace_sort'])
+            elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
+                case_label = getCaseLabel(log_df)
+                trace = sortyByTraceDuration(log_df)
+                #provisorisch:
+                trace_id_list = [a[0] for a in trace]
+                if selection_dict['xaxis_choice'] == case_label:
+                    x_axis_order = trace_id_list
+                if selection_dict['yaxis_choice'] == case_label:
+                    y_axis_order = trace_id_list[::-1]
+            else:
+                pass
             default_try = False
-            return render(request,'dcv.html',
-                              {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
-                               'legend_list': legend_list, 'attribute_list': log_attribute_list, 'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,'default_try': default_try})
+            axes_order = [x_axis_order, y_axis_order]
+            return render(request, 'dcv.html',
+                          {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
+                            'legend_list': legend_list, 'attribute_list': log_attribute_list,
+                             'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,
+                             'axes_order': axes_order,
+                             'sort_attr': sort_attr, 'attr_level': attr_level, 'default_try': default_try})
 
-            #return HttpResponse(json.dumps(label_list))
+            #else:
+
+            #return HttpResponse()
             #return HttpResponse(json.dumps(log_df.columns.tolist()))
-            #return HttpResponse(json.dumps(legend_list))
+            #return HttpResponse(["label list: ",label_list, "legend list ", legend_list])
             #return HttpResponse(json.dumps(request.POST))
             #return HttpResponse(json.dumps(log_level_attributes))
 
@@ -54,16 +100,21 @@ def dcv(request):
 
         else:
             if len(log_df.columns) != 1: #check if valid file
-                default_x_axis_df, default_y_axis_df, default_x_axis_label, default_y_axis_label = setDefault(log_df)
-                default_x_axis_list = default_x_axis_df.values.tolist()
-                default_y_axis_list = default_y_axis_df.values.tolist()
-                default_axis_list = [default_x_axis_list, default_y_axis_list]
+                default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
                 default_label_list = [default_x_axis_label, default_y_axis_label]
-                default_try= True
-                #log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
-                #return HttpResponse(json.dumps(default_axis_list))
-                return render(request, 'dcv.html', {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list, 'default_label_list': default_label_list,
-                                                'attribute_list': log_attribute_list, 'default_try': default_try, 'log_level_attributes': log_level_attributes,'case_level_attributes': case_level_attributes})
+                default_try = True
+                sort_selection = 'default;log'
+                # log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
+                # return HttpResponse(json.dumps(default_axis_list))
+                print(default_axis_order)
+                return render(request, 'dcv.html',
+                              {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list,
+                               'default_label_list': default_label_list,
+                               'attribute_list': log_attribute_list, 'default_try': default_try,
+                               'log_level_attributes': log_level_attributes,
+                               'case_level_attributes': case_level_attributes,
+                               'default_axis_order': default_axis_order,
+                               'sort_selection': sort_selection})
             else:
                 message = "file not valid or separator in CSV file not recognized"
                 return render(request, 'dcv_test.html', {'error_message': message})
@@ -72,4 +123,3 @@ def dcv(request):
     else:
         message = "no file selected"
         return render(request, 'dcv.html', {'error_message': message})
-
