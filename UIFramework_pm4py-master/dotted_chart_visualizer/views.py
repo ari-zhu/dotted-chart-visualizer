@@ -78,7 +78,8 @@ def dcv(request):
                 if selection_dict['yaxis_choice'] == case_label:
                     y_axis_order = trace_id_list[::-1]
 
-            else:
+            elif attr_level == 'log':
+
                 pass
             default_try = False
             axes_order = [x_axis_order, y_axis_order]

@@ -231,12 +231,15 @@ def sortByTime(df):
     return df.sort_values(by=[timeLabel])
 
 
-def sortByFirstInTrace(df):
+def sortByFirstInTrace(df, attr):
+    caseLabel = getCaseLabel(df)
+    timeLabel = getTimeLabel(df)
     dfu = get_unique_values(df, getCaseLabel(df))
     firstInTraceList = []
     for d in dfu:
         dfr = df.loc[df[getCaseLabel(df)] == d]
         firstInTraceList.append(dfr.iloc[0])
+    #filteredDf = pd.DataFrame(firstInTraceList)[]
     return firstInTraceList
 
 
