@@ -252,7 +252,7 @@ def sortByLastInTrace(df):
 def sortyByTraceDuration(df):
     durationList = []
     traceList = []
-    dfu = get_unique_values(df, getCaseIndex(df))
+    dfu = get_unique_values(df, getCaseLabel(df))
     for d in dfu:
         dfr = df.loc[df[getCaseLabel(df)] == d]
         finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)])
