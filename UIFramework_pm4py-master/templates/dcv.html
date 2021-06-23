@@ -11,7 +11,7 @@
 
 <body>
 <!-- Shows name of file currently in use at top of page-->
-{% if error_message %} 
+{% if error_message %}
     <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
 {% else %}
     <p style="color:green;"> {{log_name}} is used as input.</p>
@@ -120,40 +120,26 @@
         <label for="trace_sort">Sort Trace:</label>
         <select onchange="this.form.submit()" id="trace_sort" name="trace_sort">
           {% if default_label_list %}
-            <option value = "default;log" selected>Sort on original order of traces in log</option>
-            <option value ="duration;log">Sort on trace duration</option>
+            <option value = "default" selected hidden>Sort on original order of traces in log</option>
             {% for attr in case_level_attributes %}
-              <option value = "{{ attr }};first" >Sort on {{ attr }} of first event</option>
-              <option value = "{{ attr}};first">Sort on {{ attr }} of last event</option>
+                <option value="{{attr}}"> Sort on {{attr}} of first event</option>
+                <option value="{{attr}}"> Sort on {{attr}} of last event</option>
             {% endfor %}
             {% for attr in log_level_attributes %}
-               <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
+                <option value="{{attr}}"> Sort on {{attr}} of trace</option>
             {% endfor %}
-          {% elif sort_selection == "default"%}
-            <option value = "default;log" selected>Sort on original order of traces in log</option>
-          {% elif sort_selection == "duration" %}
-            <option value = "duration;log" selected>Sort on trace duration</option>
           {% else %}
-            {% for attr in case_level_attributes %}
-                {% if attr in  sort_selection %}
-                    {% if "first" in sort_selection %}
-                    <option value = "{{ sort_selection }}" selected>Sort on {{ attr }} of first event</option>
-                    <option value = "{{ sort_selection }}">Sort on {{ attr }} of last event</option>
-                    {% else %}
-                    <option value = "{{ sort_selection }}" selected>Sort in {{ attr }} of last event</option>
-                    <option value = "{{ sort_selection }}">Sort on {{ attr }} of last event</option>
-                    {% endif %}
-                {% endif %}
-                <option value="{{attr}};first"> Sort on {{attr}} of first event</option>
-                <option value="{{attr}};last"> Sort on {{attr}} of last event</option>
-            {% endfor %}
-            {% for attr in log_level_attributes %}
-                {% if attr in sort_selection %}
-                  <option value="{{attr}};log" selected> Sort on {{attr}} of trace</option>
-                {% endif %}
-                <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
-            {% endfor %}
+            {% if label_list.3 == "default" %}
+                <option value ="default" selected hidden>Choose here</option>
             {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.3 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
         </select>
 
 
@@ -162,12 +148,12 @@
 </div>
 <br>
 <div id="tester"></div>
-<script> 
+<script>
 
 function drawDefault()
 {
   var default_axis = {{ default_axis_list|safe }};
-  var default_x = default_axis[0]; //[1,2,3,4,5,6]
+  var default_x = default_axis[0];
   var default_y = default_axis[1];
   var default_label = {{ default_label_list|safe}};
   var trace1 = {
@@ -180,8 +166,8 @@ function drawDefault()
 
   var layout = {
     showlegend: false,
-    xaxis: { type: 'category',  title: default_label[0] },
-    yaxis: { type: 'category', title: default_label[1], automargin: true}
+    xaxis: { title: default_label[0] },
+    yaxis: { title: default_label[1], automargin: true}
   };
 
   var data = [ trace1 ];
@@ -198,218 +184,156 @@ function drawDefault()
 
 <script>
 function drawSomething(){
-  var axis_values = {{axis_list|safe }};
+  var axis_values = {{axis_list|safe}};
   var x_values = axis_values[0];
   var y_values = axis_values[1];
   var chosen = {{label_list|safe}};
-  var legend_list_colors = {{legend_list|safe}};
-  var legend_list_shapes = {{ legend_list|safe }}
+  var legend_list = {{legend_list|safe}};
+  var legend_list_colors = legend_list[0];
+  var legend_list_shapes = legend_list[1];
   var possible_colors =['rgb(255, 0, 0)','rgb(255, 128, 0)','rgb(255, 255, 0)',
     'rgb(128, 255, 0)','rgb(0, 255, 255)','rgb(0, 128, 255)','rgb(0, 0, 255)',
     'rgb(128, 0, 255)','rgb(255, 0, 255)','rgb(255, 0, 128)','rgb(128, 128, 128)'];
+  var possible_shapes =[0,1,2,3,5,13,17,25];
   if((chosen[2]=="Choose here")&&(chosen[3]=="Choose here"))
   {
     var trace1 = {
-      x: x_values,//['a'],
-      y: y_values,//['b'],
+      x: x_values,
+      y: y_values,
       mode: 'markers',
       type: 'scatter',
-      marker: {size: 12}
+      marker: {size: 12, color: possible_colors[5]},
+      showlegend: false,
     };
 
-    /*var layout = {
-      showlegend: false,
-      xaxis: { type: 'category', title: chosen[0] },
-      yaxis: { type: 'category', title: chosen[0], automargin: true}
-    };*/
-
-  
     var data = [ trace1 ];
   }
-  else if(chosen[2])
+  else if((chosen[2]!="Choose here")&&(chosen[3]=="Choose here"))
   {
-    //var data = [];
-    //for (var i = 0; i < 8; ++i) {
-    //  var data[i] = {
-    //    x: x_values[i],//['a'],
-    //    y: y_values[i],//['b'],
-    //    mode: 'markers',
-    //    type: 'scatter',
-    //    marker: { size: 12, color: possible_colors[i] }
-    //  };
-    //}
+    var data = [];
+    for (var i = 0; i <= 7; ++i) {
+      var j = {
+        x: x_values[i],
+        y: y_values[i],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[i],
+        marker: { size: 12, color: possible_colors[i] }
+      };
+      data.push(j);
+    }
 
-
-    var trace0 = {
-      x: x_values[0],//['a'],
-      y: y_values[0],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[0] },
-      name: legend_list_colors[0][0],
-
-    };
-    var trace1 = {
-      x: x_values[1],//['a'],
-      y: y_values[1],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[1] },
-      name: legend_list_colors[0][1]
-    };
-    var trace2 = {
-      x: x_values[2],//['a'],
-      y: y_values[2],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[2] },
-      name: legend_list_colors[0][2]
-    };
-    var trace3 = {
-      x: x_values[3],//['a'],
-      y: y_values[3],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[3] },
-      name: legend_list_colors[0][3]
-    };
-    var trace4 = {
-      x: x_values[4],//['a'],
-      y: y_values[4],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[4] },
-      name: legend_list_colors[0][4]
-    };
-    var trace5 = {
-      x: x_values[5],//['a'],
-      y: y_values[5],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[5] },
-      name: legend_list_colors[0][5]
-    };
-    var trace6 = {
-      x: x_values[6],//['a'],
-      y: y_values[6],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[6] },
-      name: legend_list_colors[0][6]
-    };
-    var trace7 = {
-      x: x_values[7],//['a'],
-      y: y_values[7],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[7] },
-      name: legend_list_colors[0][7]
-    };
-
-    var layout = {
-      showlegend: true,
-      xaxis: {type: 'category',  /*"categoryorder": "linear",
-        /*"categoryarray":  [3,2,1,6,5,4],*/ title: chosen[0] },
-      yaxis: { type: 'category', "categoryorder": "linear", title: chosen[1], automargin: true}
-    };
-    var data = [trace0 , trace1, trace2, trace3, trace4, trace5, trace6, trace7];
-  //var data = [];
-  //for(var i = 0; i < x_values.length; ++i)
-  //{
-    //data.push(trace+i);
-  //};
+    //var layout = {
+    //  showlegend: true,
+    //  xaxis: { /*type: 'category', */ /*"categoryorder": "array",
+    //    "categoryarray":  [3,2,1,6,5,4],*/ title: chosen[0] },
+    //  yaxis: { /*type: 'category', */ title: chosen[1], automargin: true}
+    //};
 
   }
-  else if(chosen[3] != "Choose here")
+  else if((chosen[2]=="Choose here")&&(chosen[3]!="Choose here"))
   {
-    //var data = [];
-    //for (var i = 0; i < 8; ++i) {
-    //  var data[i] = {
-    //    x: x_values[i],//['a'],
-    //    y: y_values[i],//['b'],
-    //    mode: 'markers',
-    //    type: 'scatter',
-    //    marker: { size: 12, color: possible_colors[i] }
-    //  };
-    //}
-    var trace0 = {
-      x: x_values[0],//['a'],
-      y: y_values[0],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[0] },
-      name: legend_list[0]
-    };
-    var trace1 = {
-      x: x_values[1],//['a'],
-      y: y_values[1],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[1] },
-      name: legend_list[1]
-    };
-    var trace2 = {
-      x: x_values[2],//['a'],
-      y: y_values[2],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[2] },
-      name: legend_list[2]
-    };
-    var trace3 = {
-      x: x_values[3],//['a'],
-      y: y_values[3],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[3] },
-      name: legend_list[3]
-    };
-    var trace4 = {
-      x: x_values[4],//['a'],
-      y: y_values[4],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[4] },
-      name: legend_list[4]
-    };
-    var trace5 = {
-      x: x_values[5],//['a'],
-      y: y_values[5],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[5] },
-      name: legend_list[5]
-    };
-    var trace6 = {
-      x: x_values[6],//['a'],
-      y: y_values[6],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[6] },
-      name: legend_list[6]
-    };
-    var trace7 = {
-      x: x_values[7],//['a'],
-      y: y_values[7],//['b'],
-      mode: 'markers',
-      type: 'scatter',
-      marker: { size: 12, color: possible_colors[7] },
-      name: legend_list[7]
-    };
+    var data = [];
+    for (var i = 0; i <= 7; ++i) {
+      var j = {
+        x: x_values[i],//['a'],
+        y: y_values[i],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_shapes[i],
+        marker: {
+          size: 12,
+          color: possible_colors[5],
+          symbol: possible_shapes[i],
+          line: { color: 'rgb(255,255,255)', width: 1}
+        }
+      };
+      data.push(j);
+    }
 
-    var layout = {
-      showlegend: true,
-      xaxis: { type: 'category', title: chosen[0] },
-      yaxis: { type: 'category', title: chosen[1], automargin: true}
-    };
-    var data = [trace0, trace1, trace2, trace3, trace4, trace5, trace6, trace7];
-  //var data = [];
-  //for(var i = 0; i < x_values.length; ++i)
-  //{
-    //data.push(trace+i);
-  //};
-
+    //var layout = {
+    //  showlegend: true,
+    //  xaxis: { /*type: 'date',*/ title: chosen[0] },
+    //  yaxis: { /*type: 'category',*/ title: chosen[1], automargin: true}
+    //};
   }
+  else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))
+  {
+    var data = [];
+    for (var i = 0; i <= 63; ++i) {
+      var j = {
+        x: x_values[i],//['a'],
+        y: y_values[i],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[(i%8)] + ', ' + legend_list_shapes[Math.floor(i/8)],
+        marker: {
+          size: 12,
+          color: possible_colors[(i%8)],
+          symbol: possible_shapes[Math.floor(i/8)],
+          line: { color: 'rgb(255,255,255)', width: 1}
+        }
+      };
+      data.push(j);
+    }
+
+    //var layout = {
+    //  showlegend: true,
+    //  xaxis: { /*type: 'date',*/ title: chosen[0] },
+    //  yaxis: { /*type: 'category',*/ title: chosen[1], automargin: true}
+    //};
+  }
+  if (chosen[0].includes("time"))
+  {
+    var layout = {
+    showlegend: true,
+    xaxis: {
+      type: 'date',
+      title: chosen[0],
+      rangeselector: {
+        buttons: [
+        {
+          count: 1,
+          label: '1m',
+          step: 'month',
+          stepmode: 'backward'
+        },
+        {
+          count: 6,
+          label: '6m',
+          step: 'month',
+          stepmode: 'backward'
+        },
+        {
+          count: 1,
+          label: '1y',
+          step: 'year',
+          stepmode: 'backward'
+        },
+        {
+          count: 5,
+          label: '5y',
+          step: 'year',
+          stepmode: 'backward'
+        },
+        {step: 'all'}
+        ]
+      },
+      rangeslider: {}
+    },
+    yaxis: { title: chosen[1], automargin: true}
+    };
+    }
+    else
+    {
+      var layout = {
+      showlegend: false,
+      xaxis: {
+        title: chosen[0],
+      },
+      yaxis: { title: chosen[1], automargin: true}
+      };
+    }
 
   Plotly.react("tester", data, layout)
 }
@@ -417,7 +341,7 @@ function drawSomething(){
 
 
 {% if default_try == False %}
-  <p>Changed</p>
+  <p>Changed: {{axis_list}} {{legend_list|safe}}</p>
   <script>drawSomething();</script>
 {% else %}
   <p>Default </p>
