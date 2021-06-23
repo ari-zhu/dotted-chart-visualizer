@@ -204,12 +204,21 @@ def convertTimeStamps(df):
 
 #returns the values of the time column converted from date time to string 
 def convertDateTimeToString(df):
-    timeIndex = getTimeIndex(dfy)
+    timeIndex = getTimeIndex(df)
     strList = []
     for v in dfy.iloc[:, timeIndex]:
         u = v.strftime("%Y-%m-%d %H:%M:%S")
         strList.append(u)
     return strList
+
+#converts date time objects of time column to string for df, no return value, df is changed
+def convertDateTimeToStringsDf(df):
+    timeIndex = getTimeIndex(df)
+    if(not isinstance(df.iloc[0,timeIndex],str)):
+        for i in range(0, len(df)):
+            df.iloc[i, getTimeIndex(df)] = df.iloc[i, getTimeIndex(df)].strftime("%Y-%m-%d %H:%M:%S")
+
+
         
 #renames column names to get prettier names, used for XES files
 def renameXesColumns(df):
