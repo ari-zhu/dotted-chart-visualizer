@@ -233,23 +233,26 @@ def sortByTime(df):
 
 def sortByFirstInTrace(df, attr):
     caseLabel = getCaseLabel(df)
-    timeLabel = getTimeLabel(df)
-    dfu = get_unique_values(df, getCaseLabel(df))
+    dfu = get_unique_values(df, caseLabel)
     firstInTraceList = []
     for d in dfu:
-        dfr = df.loc[df[getCaseLabel(df)] == d]
+        dfr = df.loc[df[caseLabel] == d]
         firstInTraceList.append(dfr.iloc[0])
-    #filteredDf = pd.DataFrame(firstInTraceList)[]
-    return firstInTraceList
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+    caseIDList = groupedDf[caseLabel].tolist()
+    return caseIDList
 
 
-def sortByLastInTrace(df):
-    dfu = get_unique_values(df, getCaseLabel(df))
-    lastInTraceList = []
+def sortByLastInTrace(df,attr):
+    caseLabel = getCaseLabel(df)
+    dfu = get_unique_values(df, caseLabel)
+    firstInTraceList = []
     for d in dfu:
-        dfr = df.loc[df[getCaseLabel(df)] == d]
-        lastInTraceList.append(dfr.iloc[-1])
-    return lastInTraceList
+        dfr = df.loc[df[caseLabel] == d]
+        firstInTraceList.append(dfr.iloc[-1])
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+    caseIDList = groupedDf[caseLabel].tolist()
+    return caseIDList
 
 
 def sortyByTraceDuration(df):
