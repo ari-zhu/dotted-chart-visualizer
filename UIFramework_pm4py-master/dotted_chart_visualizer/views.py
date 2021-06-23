@@ -5,18 +5,15 @@ from django.core.files import File
 import os
 from os import listdir
 from os.path import isfile, join
-from django.http import HttpResponseRedirect
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
-    sortByTime, getTimeLabel, sortyByTraceDuration, getCaseLabel, convertDateTimeToStringsDf
+    sortByTime, getTimeLabel, sortyByTraceDuration, \
+    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
 
 from .filter_functions import getAttributeNames
 from .utils import convertLogToDf, data_points
 
-from .utils import sorted_data_points
-import pandas as pd
-import json
 
 # Create your views here.
 
@@ -78,9 +75,26 @@ def dcv(request):
                 if selection_dict['yaxis_choice'] == case_label:
                     y_axis_order = trace_id_list[::-1]
 
-            elif attr_level == 'log':
+            else:
+                if getCaseLabel(log_df) in selection_list:
+                    case_label = getCaseLabel(log_df)
+                    if attr_level == 'log':
+                        if case_label == selection_dict['xaxis_choice']:
+                            x_axis_order = sortByFirstInTrace(log_df, sort_attr)
+                        if case_label == selection_dict['yaxis_choice']:
+                            y_axis_order = sortByFirstInTrace(log_df, sort_attr)[::-1]
+                    else:
+                        if attr_level == 'first':
+                            if case_label == selection_dict['xaxis_choice']:
+                                x_axis_order = sortByFirstInTrace(log_df, sort_attr)
+                            if case_label == selection_dict['yaxis_choice']:
+                                y_axis_order = sortByFirstInTrace(log_df, sort_attr)[::-1]
+                        else: #attr_level == 'last'
+                            if case_label == selection_dict['xaxis_choice']:
+                                x_axis_order = sortByLastInTrace(log_df, sort_attr)
+                            if case_label == selection_dict['yaxis_choice']:
+                                y_axis_order = sortByLastInTrace(log_df, sort_attr)[::-1]
 
-                pass
             default_try = False
             axes_order = [x_axis_order, y_axis_order]
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
