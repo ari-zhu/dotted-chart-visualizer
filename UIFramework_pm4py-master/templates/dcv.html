@@ -349,7 +349,7 @@ function drawSomething(){
       },
       rangeslider: {}
     },
-    yaxis: { title: chosen[1], automargin: true}
+    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: chosen[1], automargin: true}
     };
     }
     else
@@ -357,7 +357,6 @@ function drawSomething(){
       var layout = {
       showlegend: false,
       xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: chosen[0] },
-
       yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true}
       };
     }
@@ -368,7 +367,7 @@ function drawSomething(){
 
 
 {% if default_try == False %}
-  <p>Changed: {{axis_list}} {{legend_list|safe}}</p>
+
   <script>drawSomething();</script>
 {% else %}
   <p>Default </p>

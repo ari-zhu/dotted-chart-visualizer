@@ -298,7 +298,7 @@ def convertDateTimeToString(df):
         strList.append(u)
     return strList
 
-<<<<<<< HEAD
+
 #converts date time objects of time column to string for df, no return value, df is changed
 def convertDateTimeToStringsDf(df):
     timeIndex = getTimeIndex(df)
@@ -309,10 +309,7 @@ def convertDateTimeToStringsDf(df):
 
         
 #renames column names to get prettier names, used for XES files
-=======
 
-# renames column names to get prettier names, used for XES files
->>>>>>> 8e75f63a6c530ad7d8f25047f0fd4ec6e26572d9
 def renameXesColumns(df):
     df = df.rename(columns={getTimeLabel(df): "Time", getCaseLabel(df): "Case"})
     if ("org:resource" in df.columns):

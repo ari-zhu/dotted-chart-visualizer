@@ -9,7 +9,7 @@ from django.http import HttpResponseRedirect
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
-    sortByTime, getTimeLabel, sortyByTraceDuration, getCaseLabel
+    sortByTime, getTimeLabel, sortyByTraceDuration, getCaseLabel, convertDateTimeToStringsDf
 
 from .filter_functions import getAttributeNames
 from .utils import convertLogToDf, data_points
@@ -48,7 +48,7 @@ def dcv(request):
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
                 time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
-                #TODO convert dataframe
+                convertDateTimeToStringsDf(log_df)
 
                 if selection_dict['xaxis_choice'] == t_label:
                     x_axis_order = time_values_list
@@ -67,7 +67,7 @@ def dcv(request):
             if sort_attr == 'default':
                 print(attr_level)
                 print(sort_attr)
-                label_list, data_list, legend_list = data_points(log_df, selection_dict)
+                #label_list, data_list, legend_list = data_points(log_df, selection_dict)
             elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
                 case_label = getCaseLabel(log_df)
                 trace = sortyByTraceDuration(log_df)
@@ -83,6 +83,12 @@ def dcv(request):
             default_try = False
             axes_order = [x_axis_order, y_axis_order]
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
+            print("labels list")
+            print(label_list)
+            print("data_list")
+            print(data_list)
+            print("legend list")
+            print(legend_list)
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
