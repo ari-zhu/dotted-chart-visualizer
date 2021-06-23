@@ -340,4 +340,18 @@ def renameXesColumns(df):
                 df = df.rename(columns={col: colName})
     return df
 
+def getCaseOrderArray(df):
+    a = df.iloc[:,getCaseIndex(df)].tolist()
+    a.reverse()
+    return np.array(a)
+
+def getActivityForCol(df):
+    if ("Activity" in df.columns):
+        return df.loc[:,'Activity'].tolist()
+    else:
+        return None
+
+def reduceToUniqueCols(df):
+    return df.loc[:,~df.columns.duplicated()]
+
 # sorts
