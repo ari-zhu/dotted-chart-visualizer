@@ -1,10 +1,11 @@
 import os
 from os import listdir
 from os.path import isfile, join
-
+from django.http import HttpResponse
 from django.conf import settings
 import pandas as pd
 from django.http import HttpResponse
+from pytz import timezone
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
@@ -261,14 +262,16 @@ def sortyByTraceDuration(df):
     dfu = get_unique_values(df, getCaseLabel(df))
     for d in dfu:
         dfr = df.loc[df[getCaseLabel(df)] == d]
-        finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)])
-        startTime = pd.to_datetime(dfr.iloc[0][getTimeIndex(df)])
+        finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+        startTime = pd.to_datetime(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
         duration = finishTime - startTime
         durationList.append(duration)
         traceList.append(d)
         trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
-        td_sort = trace_duration_df.sort_values(by='duration', ascending=False)
+        td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
+        print(td_sort)
     return td_sort.values.tolist()
+
 
 
 # Converting TimeStamps
