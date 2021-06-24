@@ -12,7 +12,7 @@ from .filter_functions import setDefault, get_unique_values, convertTimeStamps, 
     getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
 
 from .filter_functions import getAttributeNames
-from .utils import convertLogToDf, data_points
+from .utils import convertLogToDf, data_points, selection
 
 
 # Create your views here.
@@ -34,17 +34,17 @@ def dcv(request):
             sort_attr, attr_level = selection_dict['trace_sort'].split(';')
             selection_dict.pop('trace_sort')
             selection_list = [v for k, v in selection_dict.items()]
-            print(selection_list)
 
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
 
+            #axes_only, complete, selection_list = selection(selection_dict)
+
+            #if ('duration' and getCaseLabel(log_df)) and axes_only:
+                #draw graph
+                #if sort by duration sort
 
             if getTimeLabel(log_df) in selection_list[:2]:
-                print('its a timestamps!')
-                print("sort choice")
-                print(attr_level)
-                print(sort_attr)
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
                 time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
@@ -57,8 +57,9 @@ def dcv(request):
                 if selection_dict['yaxis_choice'] == t_label:
                     y_axis_order = time_values_list[::-1]
                 else: y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
-            elif getTimeLabel(log_df) in selection_list[3:]:
-                pass #TODO: error message
+            elif getTimeLabel(log_df) in selection_list[2:]:
+                selection_dict
+                return render(request, 'dcv.html', {'error_message': error_message})
 
             else:
                 x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
@@ -67,9 +68,7 @@ def dcv(request):
             if sort_attr == 'default':
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
             elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
-                print('case label')
                 case_label = getCaseLabel(log_df)
-                print(case_label)
                 trace = sortyByTraceDuration(log_df)
                 #provisorisch:
                 trace_id_list = [a[0] for a in trace]
@@ -84,7 +83,6 @@ def dcv(request):
                     if attr_level == 'log':
                         if case_label == selection_dict['xaxis_choice']:
                             x_axis_order = sortByFirstInTrace(log_df, sort_attr)
-                            #print(x_axis_order)
                         if case_label == selection_dict['yaxis_choice']:
                             y_axis_order = sortByFirstInTrace(log_df, sort_attr)[::-1]
                     else:
@@ -102,12 +100,7 @@ def dcv(request):
             default_try = False
             axes_order = [x_axis_order, y_axis_order]
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            #print("labels list")
-            #print(label_list)
-            #print("data_list")
-            #print(data_list)
-            #print("legend list")
-            #print(legend_list)
+
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
@@ -115,13 +108,6 @@ def dcv(request):
                              'axes_order': axes_order,
                              'sort_attr': sort_attr, 'attr_level': attr_level, 'default_try': default_try})
 
-            #else:
-
-            #return HttpResponse()
-            #return HttpResponse(json.dumps(log_df.columns.tolist()))
-            #return HttpResponse(["label list: ",label_list, "legend list ", legend_list])
-            #return HttpResponse(json.dumps(request.POST))
-            #return HttpResponse(json.dumps(log_level_attributes))
 
         else:
             if len(log_df.columns) != 1: #check if valid file
@@ -129,9 +115,6 @@ def dcv(request):
                 default_label_list = [default_x_axis_label, default_y_axis_label]
                 default_try = True
                 sort_selection = 'default;log'
-                # log_attribute_list = getAttributeNames(convertLogToDf(file_dir))
-                # return HttpResponse(json.dumps(default_axis_list))
-                print(default_axis_order)
                 return render(request, 'dcv.html',
                               {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list,
                                'default_label_list': default_label_list,
@@ -146,5 +129,5 @@ def dcv(request):
 
     #error message if no event log was selected:
     else:
-        message = "no file selected"
+        message = 'You have not set any event log as input. Use "Event Data" tab to set an event log as input!'
         return render(request, 'dcv.html', {'error_message': message})

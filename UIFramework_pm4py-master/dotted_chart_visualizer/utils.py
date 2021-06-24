@@ -100,8 +100,6 @@ def data_points(df, attr_dict):
         return labels_list, data_points_list, legend_list
 
 
-def sorted_data_points(df, attr_dict, sort_attr):
-    return data_points(sort_df(df, sort_attr), attr_dict)
 
 
 

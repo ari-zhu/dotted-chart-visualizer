@@ -12,7 +12,7 @@
 <body>
 <!-- Shows name of file currently in use at top of page-->
 {% if error_message %}
-    <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
+    <p style="color:red;"> {{ error_message }} </p>
 {% else %}
     <p style="color:green;"> {{log_name}} is used as input.</p>
 {% endif %}
