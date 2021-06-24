@@ -269,7 +269,7 @@ def sortyByTraceDuration(df):
         traceList.append(d)
         trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
         td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
-        print(td_sort)
+        #print(td_sort)
     return td_sort.values.tolist()
 
 

@@ -41,7 +41,9 @@ def convertLogToDf(file_dir):
             separator = ';'
             if separator in df_event_log.columns[0]:
                 df_event_log = pd.read_csv(file_dir, sep=separator)
-        return df_event_log, getAttributeNames(df_event_log), extract_attr_log_level(df_event_log)
+        log_level_attr = extract_attr_log_level(df_event_log)
+        case_level_attr = extract_attr_case_level(df_event_log,log_level_attr)
+        return df_event_log, case_level_attr, log_level_attr
 
 
 # checks if Dataframe is Comma-Separated, returns True if it is, used in covert_log_to_df function
