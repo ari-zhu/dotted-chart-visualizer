@@ -10,11 +10,12 @@
 </head>
 
 <body>
+<h3 class="mt-4" style="color:#00529F;padding-left: 10px;">Dotted Chart Visualizer</h3>
 <!-- Shows name of file currently in use at top of page-->
 {% if fatal_error_message %}
-    <p style="color:red;"> {{ fatal_error_message }} </p>
+    <p style="color:red;padding-left: 10px;"> {{ fatal_error_message }} </p>
 {% else %}
-    <p style="color:green;"> {{log_name}} is used as input.</p>
+    <p style="color:green;padding-left: 10px;"> {{log_name}} is used as input.</p>
 {% endif %}
 
 {% if error_message %}
@@ -24,12 +25,13 @@
 
 <!-- Dropdown menu selections -->
 <br>
-<div class="row">
-  <div class=" col-sm-6 col-md-7 col-lg-8">
+<div id = "boxes">
+  <div id = "leftbox"></div>
+  <div id = "middlebox">
     <form  name="choice" action="" method = "POST">
       {% csrf_token %}
-        <p>X-axis:</p>
-        <select name="xaxis_choice">
+        <label2 for="xaxis_choice">X-Axis:</label2>
+        <select name="xaxis_choice" style="width:150px; max-width: 100%;">
 
           {% if default_label_list %}
             {% for attr in attribute_list %}
@@ -52,9 +54,9 @@
           {% endif %}
 
         </select>
-
-        <p>Y-axis:</p>
-        <select name="yaxis_choice">
+        <label2 for="yaxis_choice">Y-Axis:</label2>
+        <br>
+        <select name="yaxis_choice" style="width:150px; max-width: 100%;">
           {% if default_label_list %}
             {% for attr in attribute_list %}
               {% if attr ==  default_label_list.1 %}
@@ -73,9 +75,10 @@
             {% endfor %}
           {% endif %}
         </select>
-
-        <p>Color:</p>
-        <select name="color_choice">
+        <br>
+        <label2 for="color_choice">Color:</label2>
+        <br>
+        <select name="color_choice" style="width:150px; max-width: 100%;">
           {% if default_label_list %}
             <option selected hidden>Choose here</option>
             {% for attr in attribute_list %}
@@ -95,9 +98,10 @@
           {% endif %}
 
         </select>
-
-        <p>Shape:</p>
-        <select name="shape_choice">
+        <br>
+        <label2 for="shape_choice">Shape:</label2>
+        <br>
+        <select name="shape_choice" style="width:150px; max-width: 100%;">
           {% if default_label_list %}
             <option selected hidden>Choose here</option>
             {% for attr in attribute_list %}
@@ -122,8 +126,9 @@
         <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
       <br>
 
-        <label for="trace_sort">Sort Trace:</label>
-        <select onchange="this.form.submit()" id="trace_sort" name="trace_sort">
+        <label2 for="trace_sort">Sort Trace:</label2>
+        <br>
+        <select onchange="this.form.submit()" id="trace_sort" name="trace_sort" style="width:150px; max-width: 100%;">
           {% if default_label_list %}
             <option value = "default;log" selected hidden>Sort on original order of traces in log</option>
               <option value ="duration;log">Sort on duration of traces</option>
@@ -143,7 +148,7 @@
                 <option value ="default;log">Sort on original order of traces in log</option>
             {% else %}
                 <option value ="default;log" >Sort on original order of traces in log</option>
-                <option value = duration;log">Sort on duration of trace</option>
+                <option value = "duration;log">Sort on duration of trace</option>
             {% endif %}
 
             {% for attr in case_level_attributes %}
@@ -169,13 +174,20 @@
               {% endfor %}
             {% endif %}
         </select>
-
-
+        <br>  
+        <br>
+        <input style="margin-top: 10px;" title="Save visualization" type = "submit" class="btn btn-info" value = "Save visualization" name= "saveButton" id ='saveButton' />
+        <br>
     </form>
-      </div>
+
+  </div>
+  <div id = "rightbox">
+    <div id="tester"></div>
+  </div>
 </div>
+
 <br>
-<div id="tester"></div>
+
 <script>
 
 function drawDefault()
@@ -194,18 +206,18 @@ function drawDefault()
 
   var data = [ trace1 ];
 
-  /*var layout = {
-      showlegend: false,
-      xaxis: { "categoryorder": "array",
-        "categoryarray":  [3,5,4,6,1,2], title: default_label[0]},
-      yaxis: { type: 'category', title: default_label[1], automargin: true}};*/
+  var default_axes_order = {{ default_axis_order |safe }}
 
-    var default_axes_order = {{ default_axis_order |safe }}
-
-    var layout = {
+  var layout = {
     showlegend: false,
     xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': default_axes_order[0] ,title: default_label[0] },
-    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: default_label[1], automargin: true}
+    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: default_label[1], automargin: true},
+    margin: {
+        l: 50,
+        r: 50,
+        b: 50,
+        t: 10,
+      },
   };
 
   Plotly.react("tester", data, layout);
@@ -305,7 +317,40 @@ function drawSomething(){
           color: possible_colors[Math.floor(i/(legend_list_shapes.length))],
           symbol: possible_shapes[i%(legend_list_shapes.length)],
           line: { color: 'rgb(255,255,255)', width: 1}
-        }
+        },
+        showlegend: false,
+      };
+      data.push(j);
+    }
+    for (var i = 0; i <= (legend_list_colors.length-1); ++i) {
+      var j = {
+        x: [null],//['a'],
+        y: [null],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[i],
+        marker: {
+          size: 12,
+          color: possible_colors[i],
+          symbol: possible_shapes[0]
+        },
+        showlegend: true,
+      };
+      data.push(j);
+    }
+    for (var i = 0; i <= (legend_list_shapes.length-1); ++i) {
+      var j = {
+        x: [null],//['a'],
+        y: [null],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_shapes[i],
+        marker: {
+          size: 12,
+          color: 'rgb(0,0,0)',
+          symbol: possible_shapes[i]
+        },
+        showlegend: true,
       };
       data.push(j);
     }
@@ -351,9 +396,15 @@ function drawSomething(){
         },
         {step: 'all'}
         ]
-	},
+	    },
     },
-    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: chosen[1], automargin: true}
+    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: chosen[1], automargin: true},
+    margin: {
+        l: 50,
+        r: 50,
+        b: 50,
+        t: 10,
+      },
     };
     }
     else
@@ -361,7 +412,13 @@ function drawSomething(){
       var layout = {
       showlegend: true,
       xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: chosen[0] },
-      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true}
+      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true},
+      margin: {
+        l: 50,
+        r: 50,
+        b: 50,
+        t: 10,
+      },
       };
     }
 
@@ -371,10 +428,8 @@ function drawSomething(){
 
 
 {% if default_try == False %}
-
   <script>drawSomething();</script>
 {% else %}
-  <p>Default </p>
   <script>drawDefault();</script>
 {% endif %}
 
