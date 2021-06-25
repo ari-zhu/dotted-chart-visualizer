@@ -24,6 +24,7 @@ def dcv(request):
 
         event_logs_path = os.path.join(settings.MEDIA_ROOT, "event_logs")
         file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
+        name, extension = os.path.splitext(file_dir)
         log_df, case_level_attributes,log_level_attributes = convertLogToDf(file_dir)
         log_attribute_list = log_level_attributes+case_level_attributes
 
@@ -64,7 +65,8 @@ def dcv(request):
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
                 time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
-                convertDateTimeToStringsDf(log_df)
+                if extension == '.xes':
+                    convertDateTimeToStringsDf(log_df)
 
                 if selection_dict['xaxis_choice'] == t_label:
                     x_axis_order = time_values_list
@@ -83,7 +85,10 @@ def dcv(request):
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
             elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
                 case_label = getCaseLabel(log_df)
-                trace = sortyByTraceDuration(log_df)
+                if extension == '.csv':
+                    trace = sortyByTraceDuration(log_df,string=True)
+                else:
+                    trace = sortyByTraceDuration(log_df)
                 #provisorisch:
                 trace_id_list = [a[0] for a in trace]
                 if selection_dict['xaxis_choice'] == case_label:

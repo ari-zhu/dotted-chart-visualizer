@@ -256,19 +256,30 @@ def sortByLastInTrace(df,attr):
     return caseIDList
 
 
-def sortyByTraceDuration(df):
+def sortyByTraceDuration(df,string=False):
     durationList = []
     traceList = []
     dfu = get_unique_values(df, getCaseLabel(df))
-    for d in dfu:
-        dfr = df.loc[df[getCaseLabel(df)] == d]
-        finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
-        startTime = pd.to_datetime(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
-        duration = finishTime - startTime
-        durationList.append(duration)
-        traceList.append(d)
-        trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
-        td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
+    if string:
+        for d in dfu:
+            dfr = df.loc[df[getCaseLabel(df)] == d]
+            finishTime = convertStringToDateTime(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            startTime = convertStringToDateTime(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            duration = finishTime - startTime
+            durationList.append(duration)
+            traceList.append(d)
+            trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
+            td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
+    else:
+        for d in dfu:
+            dfr = df.loc[df[getCaseLabel(df)] == d]
+            finishTime = pd.to_datetime(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            startTime = pd.to_datetime(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            duration = finishTime - startTime
+            durationList.append(duration)
+            traceList.append(d)
+            trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
+            td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
         #print(td_sort)
     return td_sort.values.tolist()
 
@@ -277,7 +288,7 @@ def sortyByTraceDuration(df):
 # Converting TimeStamps
 
 def convertStringToDateTime(date_string):
-    format = "%Y-%m-%d %H:%M:%S"
+    format = "%Y-%m-%d %H:%M:%S%z"
     date_time_obj = datetime.datetime.strptime(date_string, format)
     return date_time_obj
 
@@ -307,6 +318,7 @@ def convertDateTimeToString(df):
         strList.append(u)
     return strList
 
+#converts strings of time column to date time for df
 
 #converts date time objects of time column to string for df, no return value, df is changed
 def convertDateTimeToStringsDf(df):
