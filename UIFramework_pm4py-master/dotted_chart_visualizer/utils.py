@@ -7,6 +7,7 @@ from .filter_functions import get_Colored_Col as get_Col_OR_Shape
 from .filter_functions import get_Colored_AND_Shaped
 from .filter_functions import get_unique_values as to_set
 from .filter_functions import getAttributeNames
+from .filter_functions import renameXesColumns
 from .filter_functions import sortByAttribute as sort_df
 
 

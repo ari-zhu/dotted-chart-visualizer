@@ -11,11 +11,16 @@
 
 <body>
 <!-- Shows name of file currently in use at top of page-->
-{% if error_message %}
-    <p style="color:red;"> {{ error_message }} </p>
+{% if fatal_error_message %}
+    <p style="color:red;"> {{ fatal_error_message }} </p>
 {% else %}
     <p style="color:green;"> {{log_name}} is used as input.</p>
 {% endif %}
+
+{% if error_message %}
+   <script> alert('Invalid Configuration');</script>
+{% endif %}
+
 
 <!-- Dropdown menu selections -->
 <br>

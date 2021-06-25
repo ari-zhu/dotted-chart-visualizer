@@ -44,6 +44,22 @@ def dcv(request):
                 #draw graph
                 #if sort by duration sort
 
+            if getTimeLabel(log_df) in selection_list[2:]:
+                error_message = 'invalid configuration'
+                #return render(request, 'dcv.html', {'error_message': error_message})
+                default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
+                default_label_list = [default_x_axis_label, default_y_axis_label]
+                default_try = True
+                sort_selection = 'default;log'
+                return render(request, 'dcv.html',
+                              {'error_message': error_message, 'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list,
+                               'default_label_list': default_label_list,
+                               'attribute_list': log_attribute_list, 'default_try': default_try,
+                               'log_level_attributes': log_level_attributes,
+                               'case_level_attributes': case_level_attributes,
+                               'default_axis_order': default_axis_order,
+                               'sort_selection': sort_selection})
+
             if getTimeLabel(log_df) in selection_list[:2]:
                 t_label = getTimeLabel(log_df)
                 log_df_time_sorted = sortByTime(log_df)
@@ -57,9 +73,7 @@ def dcv(request):
                 if selection_dict['yaxis_choice'] == t_label:
                     y_axis_order = time_values_list[::-1]
                 else: y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
-            elif getTimeLabel(log_df) in selection_list[2:]:
-                selection_dict
-                return render(request, 'dcv.html', {'error_message': error_message})
+
 
             else:
                 x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
@@ -124,10 +138,10 @@ def dcv(request):
                                'default_axis_order': default_axis_order,
                                'sort_selection': sort_selection})
             else:
-                message = "file not valid or separator in CSV file not recognized"
-                return render(request, 'dcv_test.html', {'error_message': message})
+                error_message = "file not valid or separator in CSV file not recognized"
+                return render(request, 'dcv_test.html', {'error_message': error_message})
 
     #error message if no event log was selected:
     else:
-        message = 'You have not set any event log as input. Use "Event Data" tab to set an event log as input!'
-        return render(request, 'dcv.html', {'error_message': message})
+        fatal_error_message = 'You have not set any event log as input. Use "Event Data" tab to set an event log as input!'
+        return render(request, 'dcv.html', {'fatal_error_message': fatal_error_message})
