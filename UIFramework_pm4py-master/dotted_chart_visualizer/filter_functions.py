@@ -11,6 +11,7 @@ from pm4py.objects.conversion.log import converter as log_converter
 from django.shortcuts import render
 import re
 import datetime
+import dateutil.parser
 
 
 
@@ -263,8 +264,8 @@ def sortyByTraceDuration(df,string=False):
     if string:
         for d in dfu:
             dfr = df.loc[df[getCaseLabel(df)] == d]
-            finishTime = convertStringToDateTime(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
-            startTime = convertStringToDateTime(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            finishTime = dateutil.parser.parse(dfr.iloc[-1][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
+            startTime = dateutil.parser.parse(dfr.iloc[0][getTimeIndex(df)]).replace(tzinfo=timezone('UTC'))
             duration = finishTime - startTime
             durationList.append(duration)
             traceList.append(d)
