@@ -371,3 +371,91 @@ def reduceToUniqueCols(df):
     return df.loc[:,~df.columns.duplicated()]
 
 # sorts
+
+def getAmtREQ(df):
+    CaseLabel = getCaseLabel(df)
+    amt_REQ_list = []
+    for i in df.loc[:,CaseLabel].unique():
+        amt_REQ = len(df.loc[df[CaseLabel] == i])
+        entry = [i, amt_REQ]
+        amt_REQ_list.append(entry)
+    return amt_REQ_list
+
+def getWeekDayOfTimeStamp(timeStamp):
+    day = calendar.day_name[timeStamp.weekday()]  
+    return day
+
+def getWeekDaysOfTimeColumn(timeCol):
+    resList = []
+    for i in timeCol:
+        day = getWeekDayOfTimeStamp(i)
+        resList.append(day)
+    return resList
+
+def timeSinceCaseStart(df):
+    CaseLabel = getCaseLabel(df)
+    TimeIndex = getTimeIndex(df)
+    td_list = []
+    for i in df.loc[:, CaseLabel].unique():
+        ts_start = df.loc[df[CaseLabel] == i].iloc[0,TimeIndex]
+        for j in df.loc[df[CaseLabel] == i].iloc[:,TimeIndex]:
+            ts_end = dateutil.parser.parse(j).replace(tzinfo=timezone('UTC'))
+            ts_delta = ts_end - ts_start
+            td_list.append([i, ts_delta])
+    return td_list
+
+#newest functions
+
+#gets the amount of request per trace returns list [[trace1, amtREQ1], [trace2, amtREQ2], ...]
+def getAmtREQ(df):
+    CaseLabel = getCaseLabel(df)
+    amt_REQ_list = []
+    for i in df.loc[:,CaseLabel].unique():
+        amt_REQ = len(df.loc[df[CaseLabel] == i])
+        entry = [i, amt_REQ]
+        amt_REQ_list.append(entry)
+    return amt_REQ_list
+
+#sorts the output of getAmtReq(df) by amtREQs ascending
+def sortTracesByAmtREQ(df):
+    caseList = []
+    amtList = []
+    amt_REQ_list = getAmtREQ(df)
+    for i in range(0, len(amt_REQ_list)-1):
+        case = amt_REQ_list[i][0]
+        amt = amt_REQ_list[i][1]
+        caseList.append(case) 
+        amtList.append(amt)
+    data ={'case': caseList, 'amt': amtList}
+    df = pd.DataFrame(data, columns=['case','amt'])
+    sortedByAMT = df.sort_values(by='amt', ascending=True)
+    return sortedByAMT.values.tolist()
+
+#returns the weekday of a timestamp
+def getWeekDayOfTimeStamp(timeStamp):
+    day = calendar.day_name[timeStamp.weekday()]  
+    return day
+
+#returns a list of corresponding weekday for every entry in TimeCol 
+def getWeekDaysOfTimeColumn(timeCol):
+    resList = []
+    for i in timeCol:
+        day = getWeekDayOfTimeStamp(i)
+        resList.append(day)
+    return resList
+
+#for every event the time since start of case is calculated,
+#return value is a list with timeSinceCaseStart for every event in Df
+
+def timeSinceCaseStart(df):
+    CaseLabel = getCaseLabel(df)
+    TimeIndex = getTimeIndex(df)
+    td_list = []
+    for i in df.loc[:, CaseLabel].unique():
+        ts_start = df.loc[df[CaseLabel] == i].iloc[0,TimeIndex]
+        for j in df.loc[df[CaseLabel] == i].iloc[:,TimeIndex]:
+            ts_end = dateutil.parser.parse(j).replace(tzinfo=timezone('UTC'))
+            ts_delta = ts_end - ts_start
+            td_list.append([i, ts_delta])
+    return td_list
+
