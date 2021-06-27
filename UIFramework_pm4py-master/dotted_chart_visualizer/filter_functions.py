@@ -259,7 +259,7 @@ def sortByLastInTrace(df,attr):
     return caseIDList
 
 
-def sortyByTraceDuration(df,string=False):
+def sortByTraceDuration(df,string=False):
     durationList = []
     traceList = []
     dfu = get_unique_values(df, getCaseLabel(df))
