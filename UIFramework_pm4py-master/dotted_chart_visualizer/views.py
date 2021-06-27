@@ -8,11 +8,11 @@ from os.path import isfile, join
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
-    sortByTime, getTimeLabel, sortyByTraceDuration, \
+    sortByTime, getTimeLabel, sortByTraceDuration, \
     getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
 
 from .filter_functions import getAttributeNames
-from .utils import convertLogToDf, data_points, selection
+from .utils import convertLogToDf, data_points, selection, appendColumn
 
 
 # Create your views here.
@@ -26,7 +26,7 @@ def dcv(request):
         file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
         name, extension = os.path.splitext(file_dir)
         log_df, case_level_attributes,log_level_attributes = convertLogToDf(file_dir)
-        log_attribute_list = log_level_attributes+case_level_attributes
+        log_attribute_list = log_level_attributes + ["case:duration", "time:DaysofTheWeek"] + case_level_attributes
 
         if request.method == 'POST':
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
@@ -34,20 +34,20 @@ def dcv(request):
             selection_dict.pop('csrfmiddlewaretoken')
             sort_attr, attr_level = selection_dict['trace_sort'].split(';')
             selection_dict.pop('trace_sort')
-            selection_list = [v for k, v in selection_dict.items()]
-
+            #selection_list = [v for k, v in selection_dict.items()]
+            case_label = getCaseLabel(log_df)
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
 
-            #axes_only, complete, selection_list = selection(selection_dict)
+            axes_only, complete, selection_list = selection(selection_dict)
+            print(selection_list)
 
             #if ('duration' and getCaseLabel(log_df)) and axes_only:
                 #draw graph
                 #if sort by duration sort
 
-            if getTimeLabel(log_df) in selection_list[2:]:
+            if getTimeLabel(log_df) in selection_list[2:] or ('case:duration' in selection_list[:2] and (not case_label in selection_list[:2] or not axes_only)):
                 error_message = 'invalid configuration'
-                #return render(request, 'dcv.html', {'error_message': error_message})
                 default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
                 default_label_list = [default_x_axis_label, default_y_axis_label]
                 default_try = True
@@ -61,10 +61,19 @@ def dcv(request):
                                'default_axis_order': default_axis_order,
                                'sort_selection': sort_selection})
 
-            if getTimeLabel(log_df) in selection_list[:2]:
+            if 'case:duration' in selection_list or sort_attr=="case:duration":
+                case_label = getCaseLabel(log_df)
+                if extension == '.csv':
+                    trace = sortByTraceDuration(log_df, string=True)
+                else:
+                    trace = sortByTraceDuration(log_df)
+                duration_list = [str(a[1]) for a in trace]
+                log_df = appendColumn(log_df, 'case:duration', duration_list, case_label)
+
+
+            if getTimeLabel(log_df):
                 t_label = getTimeLabel(log_df)
-                log_df_time_sorted = sortByTime(log_df)
-                time_values_list = convertDateTimeToString(convertTimeStamps(log_df_time_sorted))
+                time_values_list = convertDateTimeToString(convertTimeStamps(log_df))
                 if extension == '.xes':
                     convertDateTimeToStringsDf(log_df)
 
@@ -83,18 +92,17 @@ def dcv(request):
 
             if sort_attr == 'default':
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            elif sort_attr == 'duration' and getCaseLabel(log_df) in selection_list[:2]:
-                case_label = getCaseLabel(log_df)
-                if extension == '.csv':
-                    trace = sortyByTraceDuration(log_df,string=True)
-                else:
-                    trace = sortyByTraceDuration(log_df)
+            elif sort_attr == 'case:duration' and getCaseLabel(log_df) in selection_list[:2] or 'case:duration' in selection_list:
                 #provisorisch:
                 trace_id_list = [a[0] for a in trace]
                 if selection_dict['xaxis_choice'] == case_label:
                     x_axis_order = trace_id_list
+                elif selection_dict['xaxis_choice'] == 'case:duration':
+                    x_axis_order = duration_list
                 if selection_dict['yaxis_choice'] == case_label:
                     y_axis_order = trace_id_list[::-1]
+                elif selection_dict['yaxis_choice'] == 'case:duration':
+                    y_axis_order = duration_list
 
             else:
                 if getCaseLabel(log_df) in selection_list:
@@ -118,7 +126,12 @@ def dcv(request):
 
             default_try = False
             axes_order = [x_axis_order, y_axis_order]
-            label_list, data_list, legend_list = data_points(log_df, selection_dict)
+            if 'case:duration' in selection_list[:2]: #same for days of the week
+                label_list = selection_list[:2] + ["Choose here", "Choose here"]
+                data_list = [x_axis_order, y_axis_order]
+                legend_list = []
+            else:
+                label_list, data_list, legend_list = data_points(log_df, selection_dict)
 
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
@@ -134,6 +147,7 @@ def dcv(request):
                 default_label_list = [default_x_axis_label, default_y_axis_label]
                 default_try = True
                 sort_selection = 'default;log'
+                #print(default_axis_order)
                 return render(request, 'dcv.html',
                               {'log_name': settings.EVENT_LOG_NAME, 'default_axis_list': default_axis_list,
                                'default_label_list': default_label_list,

@@ -12,7 +12,7 @@ from django.shortcuts import render
 import re
 import datetime
 import dateutil.parser
-
+import calendar
 
 
 # returns the number of events of event log df
@@ -67,17 +67,55 @@ def getTrace(df, traceIndex):
 
 # returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
 def setDefault(df):
-    if ('Case' in df.columns and 'Activity' in df.columns):
-        x_Axis = df['Case'].tolist()
-        y_Axis = df['Activity'].tolist()
-        x_axis_order = df['Case'].unique().tolist()
-        y_axis_order = df['Activity'].unique().tolist()
-        xLabel = 'Case'
-        yLabel = 'Activity'
-        print("done")
-        return [df['Case'], df['Activity']], xLabel, yLabel , [x_axis_order, y_axis_order]
+    pattern = re.compile("case:concept.*|(C|c)ase.*|(T|t)race.*")
+    x_label = None
+    x_column = None
+
+    for col in df.columns:
+        match = pattern.match(col)
+
+        if match is None:
+            pass
+        else:
+            x_label = match.group()
+            break
+
+    pattern = re.compile("concept.*|(E|e)vent.*|(A|a)ctivit.*")
+    y_label = None
+    y_column = None
+
+    for col in df.columns:
+        match = pattern.match(col)
+
+        if match is None:
+            pass
+        else:
+            y_label = match.group()
+            break
+
+    if ((x_label is None) & (y_label is None)):
+        x_column = df.iloc[:, 0]
+        y_column = df.iloc[:, 1]
+        x_label = df.columns[0]
+        y_label = df.columns[1]
+    elif ((x_label is None) & (y_label is not None)):
+        x_column = df.iloc[:, 0]
+        y_column = df[y_label]
+        x_label = df.columns[0]
+    elif ((x_label is not None) & (y_label is None)):
+        x_column = df[x_label]
+        y_column = df.iloc[:, 1]
+        y_label = df.columns[1]
     else:
-        return [df.iloc[:,0], df.iloc[:,1]], df.columns[0], df.columns[1], [df.iloc[:,0].unique().tolist(), df.iloc[:,1].unique().tolist()]
+        x_column = df[x_label]
+        y_column = df[y_label]
+
+    x_column = x_column.tolist()
+    y_column = y_column.tolist()
+    x_axis_order = get_unique_values(df, x_label).tolist()
+    y_axis_order = get_unique_values(df, y_label).tolist()[::-1]
+    return [x_column, y_column], x_label, y_label, [x_axis_order, y_axis_order]
+
 
 def get_unique_values(df, col_name):
     return df[col_name].unique()
@@ -202,7 +240,9 @@ def sortByFirstInTrace(df, attr):
     for d in dfu:
         dfr = df.loc[df[caseLabel] == d]
         firstInTraceList.append(dfr.iloc[0])
-    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+        #print(dfr.iloc[0])
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values(by=[attr], kind='mergesort')
+    #print(groupedDf['case:concept:name'])
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
@@ -214,12 +254,12 @@ def sortByLastInTrace(df,attr):
     for d in dfu:
         dfr = df.loc[df[caseLabel] == d]
         firstInTraceList.append(dfr.iloc[-1])
-    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values(by=[attr], kind='mergesort')
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
 
-def sortyByTraceDuration(df,string=False):
+def sortByTraceDuration(df,string=False):
     durationList = []
     traceList = []
     dfu = get_unique_values(df, getCaseLabel(df))

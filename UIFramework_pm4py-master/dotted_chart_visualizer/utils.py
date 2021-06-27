@@ -101,6 +101,15 @@ def data_points(df, attr_dict):
         return labels_list, data_points_list, legend_list
 
 
+def appendColumn(df, newName, list, caseLabel):
+    dfu = df[caseLabel].unique()
+    series = []
+    for i in range(len(list)):
+        for k in df[caseLabel]:
+            if k == dfu[i]:
+                series += [list[i]]
+    df[newName] = series
+    return df
 
 
 
