@@ -7,8 +7,13 @@ from os import listdir
 from os.path import isfile, join
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
-from .filter_functions import *
-from .utils import *
+from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
+    sortByTime, getTimeLabel, sortyByTraceDuration, \
+    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
+
+from .filter_functions import getAttributeNames
+from .utils import convertLogToDf, data_points, selection
+
 
 # Create your views here.
 

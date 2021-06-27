@@ -12,7 +12,6 @@ from django.shortcuts import render
 import re
 import datetime
 import dateutil.parser
-import numpy as np
 
 
 
@@ -116,6 +115,10 @@ def setDefault(df):
     x_axis_order = get_unique_values(df, x_label).tolist()
     y_axis_order = get_unique_values(df, y_label).tolist()[::-1]
     return [x_column, y_column], x_label, y_label, [x_axis_order, y_axis_order]
+
+
+def get_unique_values(df, col_name):
+    return df[col_name].unique()
 
 
 def get_Colored_Values(df, color_att, color_val, target_att):
@@ -224,12 +227,12 @@ def sortByTrace(df):
     caseLabel = getCaseLabel(df)
     return df.sort_values(by=[caseLabel])
 
-# sorts df by time
+
 def sortByTime(df):
     timeLabel = getTimeLabel(df)
     return df.sort_values(by=[timeLabel])
 
-# returns order of case id's grouped by last event in trace
+
 def sortByFirstInTrace(df, attr):
     caseLabel = getCaseLabel(df)
     dfu = get_unique_values(df, caseLabel)
@@ -241,7 +244,7 @@ def sortByFirstInTrace(df, attr):
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
-# returns order of case id's grouped by first event in trace
+
 def sortByLastInTrace(df,attr):
     caseLabel = getCaseLabel(df)
     dfu = get_unique_values(df, caseLabel)
@@ -316,6 +319,7 @@ def convertDateTimeToString(df):
         strList.append(u)
     return strList
 
+#converts strings of time column to date time for df
 
 #converts date time objects of time column to string for df, no return value, df is changed
 def convertDateTimeToStringsDf(df):
