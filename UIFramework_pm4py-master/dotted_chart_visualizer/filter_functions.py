@@ -68,45 +68,17 @@ def getTrace(df, traceIndex):
 
 # returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
 def setDefault(df):
-
-    x_label = getCaseLabel(df)
-
-    pattern = re.compile("concept.*|(E|e)vent.*|(A|a)ctivit.*")
-    y_label = None
-    y_column = None
-
-    for col in df.columns:
-        match = pattern.match(col)
-
-        if match is None:
-            pass
-        else:
-            y_label = match.group()
-            break
-
-    if ((x_label is None) & (y_label is None)):
-        x_column = df.iloc[:, 0]
-        y_column = df.iloc[:, 1]
-        x_label = df.columns[0]
-        y_label = df.columns[1]
-    elif ((x_label is None) & (y_label is not None)):
-        x_column = df.iloc[:, 0]
-        y_column = df[y_label]
-        x_label = df.columns[0]
-    elif ((x_label is not None) & (y_label is None)):
-        x_column = df[x_label]
-        y_column = df.iloc[:, 1]
-        y_label = df.columns[1]
+    if ('Case' in df.columns and 'Activity' in df.columns):
+        x_Axis = df['Case'].tolist()
+        y_Axis = df['Activity'].tolist()
+        x_axis_order = df['Case'].unique().tolist()
+        y_axis_order = df['Activity'].unique().tolist()
+        xLabel = 'Case'
+        yLabel = 'Activity'
+        print("done")
+        return [df['Case'], df['Activity']], xLabel, yLabel , [x_axis_order, y_axis_order]
     else:
-        x_column = df[x_label]
-        y_column = df[y_label]
-
-    x_column = x_column.tolist()
-    y_column = y_column.tolist()
-    x_axis_order = get_unique_values(df, x_label).tolist()
-    y_axis_order = get_unique_values(df, y_label).tolist()[::-1]
-    return [x_column, y_column], x_label, y_label, [x_axis_order, y_axis_order]
-
+        return [df.iloc[:,0], df.iloc[:,1]], df.columns[0], df.columns[1], [df.iloc[:,0].unique().tolist(), df.iloc[:,1].unique().tolist()]
 
 def get_unique_values(df, col_name):
     return df[col_name].unique()
@@ -311,7 +283,7 @@ def convertDateTimeToString(df):
     return strList
 
 
-# converts date time objects of time column to string for df, no return value, df is changed
+#converts date time objects of time column to string for df, no return value, df is changed
 def convertDateTimeToStringsDf(df):
     timeIndex = getTimeIndex(df)
     if(not isinstance(df.iloc[0,timeIndex],str)):
@@ -320,7 +292,8 @@ def convertDateTimeToStringsDf(df):
 
 
         
-# renames column names to get prettier names, used for XES files
+#renames column names to get prettier names, used for XES files
+
 def renameXesColumns(df):
     df = df.rename(columns={getTimeLabel(df): "Time", getCaseLabel(df): "Case"})
     if ("org:resource" in df.columns):
@@ -360,3 +333,91 @@ def reduceToUniqueCols(df):
     return df.loc[:,~df.columns.duplicated()]
 
 # sorts
+
+def getAmtREQ(df):
+    CaseLabel = getCaseLabel(df)
+    amt_REQ_list = []
+    for i in df.loc[:,CaseLabel].unique():
+        amt_REQ = len(df.loc[df[CaseLabel] == i])
+        entry = [i, amt_REQ]
+        amt_REQ_list.append(entry)
+    return amt_REQ_list
+
+def getWeekDayOfTimeStamp(timeStamp):
+    day = calendar.day_name[timeStamp.weekday()]  
+    return day
+
+def getWeekDaysOfTimeColumn(timeCol):
+    resList = []
+    for i in timeCol:
+        day = getWeekDayOfTimeStamp(i)
+        resList.append(day)
+    return resList
+
+def timeSinceCaseStart(df):
+    CaseLabel = getCaseLabel(df)
+    TimeIndex = getTimeIndex(df)
+    td_list = []
+    for i in df.loc[:, CaseLabel].unique():
+        ts_start = df.loc[df[CaseLabel] == i].iloc[0,TimeIndex]
+        for j in df.loc[df[CaseLabel] == i].iloc[:,TimeIndex]:
+            ts_end = dateutil.parser.parse(j).replace(tzinfo=timezone('UTC'))
+            ts_delta = ts_end - ts_start
+            td_list.append([i, ts_delta])
+    return td_list
+
+#newest functions
+
+#gets the amount of request per trace returns list [[trace1, amtREQ1], [trace2, amtREQ2], ...]
+def getAmtREQ(df):
+    CaseLabel = getCaseLabel(df)
+    amt_REQ_list = []
+    for i in df.loc[:,CaseLabel].unique():
+        amt_REQ = len(df.loc[df[CaseLabel] == i])
+        entry = [i, amt_REQ]
+        amt_REQ_list.append(entry)
+    return amt_REQ_list
+
+#sorts the output of getAmtReq(df) by amtREQs ascending
+def sortTracesByAmtREQ(df):
+    caseList = []
+    amtList = []
+    amt_REQ_list = getAmtREQ(df)
+    for i in range(0, len(amt_REQ_list)-1):
+        case = amt_REQ_list[i][0]
+        amt = amt_REQ_list[i][1]
+        caseList.append(case) 
+        amtList.append(amt)
+    data ={'case': caseList, 'amt': amtList}
+    df = pd.DataFrame(data, columns=['case','amt'])
+    sortedByAMT = df.sort_values(by='amt', ascending=True)
+    return sortedByAMT.values.tolist()
+
+#returns the weekday of a timestamp
+def getWeekDayOfTimeStamp(timeStamp):
+    day = calendar.day_name[timeStamp.weekday()]  
+    return day
+
+#returns a list of corresponding weekday for every entry in TimeCol 
+def getWeekDaysOfTimeColumn(timeCol):
+    resList = []
+    for i in timeCol:
+        day = getWeekDayOfTimeStamp(i)
+        resList.append(day)
+    return resList
+
+#for every event the time since start of case is calculated,
+#return value is a list with timeSinceCaseStart for every event in Df
+
+def timeSinceCaseStart(df):
+    CaseLabel = getCaseLabel(df)
+    TimeIndex = getTimeIndex(df)
+    td_list = []
+    for i in df.loc[:, CaseLabel].unique():
+        ts_start = df.loc[df[CaseLabel] == i].iloc[0,TimeIndex]
+        for j in df.loc[df[CaseLabel] == i].iloc[:,TimeIndex]:
+            ts_end = dateutil.parser.parse(j).replace(tzinfo=timezone('UTC'))
+            ts_delta = ts_end - ts_start
+            td_list.append([i, ts_delta])
+    return td_list
+
