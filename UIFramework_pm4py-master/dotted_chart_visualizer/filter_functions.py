@@ -12,7 +12,7 @@ from django.shortcuts import render
 import re
 import datetime
 import dateutil.parser
-
+import calendar
 
 
 # returns the number of events of event log df
@@ -240,7 +240,9 @@ def sortByFirstInTrace(df, attr):
     for d in dfu:
         dfr = df.loc[df[caseLabel] == d]
         firstInTraceList.append(dfr.iloc[0])
-    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+        #print(dfr.iloc[0])
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values(by=[attr], kind='mergesort')
+    #print(groupedDf['case:concept:name'])
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
@@ -252,7 +254,7 @@ def sortByLastInTrace(df,attr):
     for d in dfu:
         dfr = df.loc[df[caseLabel] == d]
         firstInTraceList.append(dfr.iloc[-1])
-    groupedDf = pd.DataFrame(firstInTraceList).sort_values([attr])
+    groupedDf = pd.DataFrame(firstInTraceList).sort_values(by=[attr], kind='mergesort')
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
