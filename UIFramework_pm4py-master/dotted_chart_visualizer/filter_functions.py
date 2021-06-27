@@ -111,9 +111,11 @@ def setDefault(df):
         x_column = df[x_label]
         y_column = df[y_label]
 
-    return x_column, y_column, x_label, y_label
-def get_unique_values(df, col_name):
-    return df[col_name].unique()
+    x_column = x_column.tolist()
+    y_column = y_column.tolist()
+    x_axis_order = get_unique_values(df, x_label).tolist()
+    y_axis_order = get_unique_values(df, y_label).tolist()[::-1]
+    return [x_column, y_column], x_label, y_label, [x_axis_order, y_axis_order]
 
 
 def get_Colored_Values(df, color_att, color_val, target_att):
