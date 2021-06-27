@@ -7,13 +7,8 @@ from os import listdir
 from os.path import isfile, join
 from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
-from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
-    sortByTime, getTimeLabel, sortyByTraceDuration, \
-    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
-
-from .filter_functions import getAttributeNames
-from .utils import convertLogToDf, data_points, selection
-
+from filter_functions import *
+from utils import *
 
 # Create your views here.
 
@@ -26,6 +21,7 @@ def dcv(request):
         file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
         name, extension = os.path.splitext(file_dir)
         log_df, case_level_attributes,log_level_attributes = convertLogToDf(file_dir)
+        log_df = renameXesColumns(log_df)
         log_attribute_list = log_level_attributes+case_level_attributes
 
         if request.method == 'POST':
