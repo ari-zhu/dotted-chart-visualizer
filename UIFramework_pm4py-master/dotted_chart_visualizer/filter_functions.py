@@ -12,6 +12,7 @@ from django.shortcuts import render
 import re
 import datetime
 import dateutil.parser
+import numpy as np
 
 
 
@@ -67,18 +68,8 @@ def getTrace(df, traceIndex):
 
 # returns the Cases/Traces and Events/Activity Columns of a dataframe (for the default option of the plot)
 def setDefault(df):
-    pattern = re.compile("case:concept.*|(C|c)ase.*|(T|t)race.*")
-    x_label = None
-    x_column = None
 
-    for col in df.columns:
-        match = pattern.match(col)
-
-        if match is None:
-            pass
-        else:
-            x_label = match.group()
-            break
+    x_label = getCaseLabel(df)
 
     pattern = re.compile("concept.*|(E|e)vent.*|(A|a)ctivit.*")
     y_label = None
@@ -227,12 +218,12 @@ def sortByTrace(df):
     caseLabel = getCaseLabel(df)
     return df.sort_values(by=[caseLabel])
 
-
+# sorts df by time
 def sortByTime(df):
     timeLabel = getTimeLabel(df)
     return df.sort_values(by=[timeLabel])
 
-
+# returns order of case id's grouped by last event in trace
 def sortByFirstInTrace(df, attr):
     caseLabel = getCaseLabel(df)
     dfu = get_unique_values(df, caseLabel)
@@ -244,7 +235,7 @@ def sortByFirstInTrace(df, attr):
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
-
+# returns order of case id's grouped by first event in trace
 def sortByLastInTrace(df,attr):
     caseLabel = getCaseLabel(df)
     dfu = get_unique_values(df, caseLabel)
@@ -319,9 +310,8 @@ def convertDateTimeToString(df):
         strList.append(u)
     return strList
 
-#converts strings of time column to date time for df
 
-#converts date time objects of time column to string for df, no return value, df is changed
+# converts date time objects of time column to string for df, no return value, df is changed
 def convertDateTimeToStringsDf(df):
     timeIndex = getTimeIndex(df)
     if(not isinstance(df.iloc[0,timeIndex],str)):
@@ -330,8 +320,7 @@ def convertDateTimeToStringsDf(df):
 
 
         
-#renames column names to get prettier names, used for XES files
-
+# renames column names to get prettier names, used for XES files
 def renameXesColumns(df):
     df = df.rename(columns={getTimeLabel(df): "Time", getCaseLabel(df): "Case"})
     if ("org:resource" in df.columns):
