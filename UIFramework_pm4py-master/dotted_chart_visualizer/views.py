@@ -45,7 +45,7 @@ def dcv(request):
             axes_only, complete, selection_list = selection(selection_dict)
 
 
-            if getTimeLabel(log_df) in selection_list[2:] or ('case:duration' in selection_list[:2] and (not case_label in selection_list[:2] or not axes_only)):
+            if getTimeLabel(log_df) in selection_list[2:] or ('case:duration' in selection_list[:2] and not case_label in selection_list[:2]):
                 error_message = 'invalid configuration'
                 default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
                 default_label_list = [default_x_axis_label, default_y_axis_label]
