@@ -33,6 +33,7 @@
       {% csrf_token %}
       <!-- Dropdown menu selection for X-axis-->
         <label2 for="xaxis_choice">X-Axis:</label2>
+	<br>
         <select name="xaxis_choice" style="width:150px; max-width: 100%;">
 
           {% if default_label_list %}
@@ -56,6 +57,7 @@
           {% endif %}
 
         </select>
+	<br>
         <!-- Dropdown menu selection for Y-axis-->
         <label2 for="yaxis_choice">Y-Axis:</label2>
         <br>
@@ -126,6 +128,7 @@
           {% endif %}
 
         </select>
+	<br>
         <!-- Dropdown menu selection Trace-Sort-->
         <label2 for="trace_sort">Sort Trace:</label2>
         <br>
@@ -183,7 +186,7 @@
     <!--Button to download an image of the current visualization-->
     <br>
     <input onclick="saveVis()" style="margin-top: 10px; max-width: 100%;" title="Save visualization" type = "button" class="btn btn-info" value = "Save visualization" name= "saveButton" id ='saveButton' />
-    <br>
+
   </div>
   <!-- Div for the plotly-Graph-->
   <div id = "rightbox">
