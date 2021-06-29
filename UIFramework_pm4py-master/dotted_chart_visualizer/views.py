@@ -74,7 +74,10 @@ def dcv(request):
                 print(log_df)
 
             if 'DaysofTheWeek' in selection_list:
-                log_df['DaysofTheWeek'] = getWeekDaysOfTimeColumn(log_df[t_label])
+                if extension == '.csv':
+                    log_df['DaysofTheWeek'] = getWeekDaysOfTimeColumn(log_df[t_label], string=True)
+                else: #xes
+                    log_df['DaysofTheWeek'] = getWeekDaysOfTimeColumn(log_df[t_label])
                 days_order = ['Monday', 'Tuesday','Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
             if getTimeLabel(log_df) in selection_list:

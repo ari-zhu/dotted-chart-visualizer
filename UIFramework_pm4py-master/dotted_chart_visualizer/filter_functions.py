@@ -376,39 +376,8 @@ def getActivityForCol(df):
 def reduceToUniqueCols(df):
     return df.loc[:,~df.columns.duplicated()]
 
-# sorts
 
-def getAmtREQ(df):
-    CaseLabel = getCaseLabel(df)
-    amt_REQ_list = []
-    for i in df.loc[:,CaseLabel].unique():
-        amt_REQ = len(df.loc[df[CaseLabel] == i])
-        entry = [i, amt_REQ]
-        amt_REQ_list.append(entry)
-    return amt_REQ_list
 
-def getWeekDayOfTimeStamp(timeStamp):
-    day = calendar.day_name[timeStamp.weekday()]  
-    return day
-
-def getWeekDaysOfTimeColumn(timeCol):
-    resList = []
-    for i in timeCol:
-        day = getWeekDayOfTimeStamp(i)
-        resList.append(day)
-    return resList
-
-def timeSinceCaseStart(df):
-    CaseLabel = getCaseLabel(df)
-    TimeIndex = getTimeIndex(df)
-    td_list = []
-    for i in df.loc[:, CaseLabel].unique():
-        ts_start = df.loc[df[CaseLabel] == i].iloc[0,TimeIndex]
-        for j in df.loc[df[CaseLabel] == i].iloc[:,TimeIndex]:
-            ts_end = dateutil.parser.parse(j).replace(tzinfo=timezone('UTC'))
-            ts_delta = ts_end - ts_start
-            td_list.append([i, ts_delta])
-    return td_list
 
 #newest functions
 
@@ -437,18 +406,24 @@ def sortTracesByAmtREQ(df):
     sortedByAMT = df.sort_values(by='amt', ascending=True)
     return sortedByAMT.values.tolist()
 
-#returns the weekday of a timestamp
+# returns the weekday of a timestamp
 def getWeekDayOfTimeStamp(timeStamp):
     day = calendar.day_name[timeStamp.weekday()]  
     return day
 
-#returns a list of corresponding weekday for every entry in TimeCol 
-def getWeekDaysOfTimeColumn(timeCol):
+# returns list of weekday for each row in dataframe
+def getWeekDaysOfTimeColumn(timeCol, string=False):
     resList = []
-    for i in timeCol:
-        day = getWeekDayOfTimeStamp(i)
-        resList.append(day)
+    if string:
+        for i in timeCol:
+            day = getWeekDayOfTimeStamp(dateutil.parser.parse(i).replace(tzinfo=timezone('UTC')))
+            resList.append(day)
+    else:
+        for i in timeCol:
+            day = getWeekDayOfTimeStamp(i)
+            resList.append(day)
     return resList
+
 
 #for every event the time since start of case is calculated,
 #return value is a list with timeSinceCaseStart for every event in Df
