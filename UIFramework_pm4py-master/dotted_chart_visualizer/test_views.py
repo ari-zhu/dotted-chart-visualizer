@@ -22,3 +22,15 @@ class TestViews(TestCase):
             },
         )
         self.assertEqual(response.status_code, 200)
+
+    def test_POST_event_log_not_set(self):
+        self.client = Client()
+        self.dcv_url = reverse("dotted-chart-visualizer")
+        response = self.client.post(
+            self.dcv_url,
+            {
+                "fatal_error_message":'You have not set any event log as input. Use "Event Data" tab to set an event log as input!'
+
+            },
+        )
+        self.assertEqual(response.status_code, 200)
