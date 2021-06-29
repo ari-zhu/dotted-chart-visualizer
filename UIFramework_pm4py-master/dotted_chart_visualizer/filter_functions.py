@@ -258,8 +258,7 @@ def sortByLastInTrace(df,attr):
     caseIDList = groupedDf[caseLabel].tolist()
     return caseIDList
 
-
-def sortByTraceDuration(df,string=False):
+def getTraceDuration(df,string=False):
     durationList = []
     traceList = []
     dfu = get_unique_values(df, getCaseLabel(df))
@@ -272,7 +271,7 @@ def sortByTraceDuration(df,string=False):
             durationList.append(duration)
             traceList.append(d)
             trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
-            td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
+
     else:
         for d in dfu:
             dfr = df.loc[df[getCaseLabel(df)] == d]
@@ -281,10 +280,15 @@ def sortByTraceDuration(df,string=False):
             duration = finishTime - startTime
             durationList.append(duration)
             traceList.append(d)
+
             trace_duration_df = pd.DataFrame(list(zip(traceList, durationList)), columns=['trace', 'duration'])
-            td_sort = trace_duration_df.sort_values(by='duration', ascending=True)
-        #print(td_sort)
-    return td_sort.values.tolist()
+
+    return trace_duration_df
+
+
+def sortByTraceDuration(df):
+    td_sort = df.sort_values(by='duration', kind= 'mergesort', ascending=True)
+    return td_sort
 
 
 

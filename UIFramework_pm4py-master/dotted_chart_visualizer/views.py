@@ -9,7 +9,8 @@ from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
     sortByTime, getTimeLabel, sortByTraceDuration, \
-    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace, getWeekDaysOfTimeColumn
+    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace, getWeekDaysOfTimeColumn,\
+    getTraceDuration
 
 from .filter_functions import getAttributeNames
 from .utils import convertLogToDf, data_points, selection, appendColumn
@@ -26,9 +27,6 @@ def dcv(request):
         file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
         name, extension = os.path.splitext(file_dir)
         log_df, case_level_attributes,log_level_attributes = convertLogToDf(file_dir)
-        print("For Real")
-        print(type(log_df[getTimeLabel(log_df)][0]))
-        #print('for real end')
         log_attribute_list = log_level_attributes + ["case:duration", "DaysofTheWeek"] + case_level_attributes
 
         if request.method == 'POST':
@@ -46,9 +44,6 @@ def dcv(request):
 
             axes_only, complete, selection_list = selection(selection_dict)
 
-            #if ('duration' and getCaseLabel(log_df)) and axes_only:
-                #draw graph
-                #if sort by duration sort
 
             if getTimeLabel(log_df) in selection_list[2:] or ('case:duration' in selection_list[:2] and (not case_label in selection_list[:2] or not axes_only)):
                 error_message = 'invalid configuration'
@@ -65,14 +60,18 @@ def dcv(request):
                                'default_axis_order': default_axis_order,
                                'sort_selection': sort_selection})
 
-            if 'case:duration' in selection_list or sort_attr=="case:duration":
+            if 'case:duration' in selection_list or sort_attr =="case:duration":
                 case_label = getCaseLabel(log_df)
                 if extension == '.csv':
-                    trace = sortByTraceDuration(log_df, string=True)
+                    trace_df = getTraceDuration(log_df)
+                    trace_list = trace_df.values.tolist()
                 else:
-                    trace = sortByTraceDuration(log_df)
-                duration_list = [str(a[1]) for a in trace]
+                    trace_df = getTraceDuration(log_df)
+                    trace_list = trace_df.values.tolist()
+                duration_list = [str(a[1]) for a in trace_list]
+                #print(duration_list)
                 log_df = appendColumn(log_df, 'case:duration', duration_list, case_label)
+                print(log_df)
 
             if 'DaysofTheWeek' in selection_list:
                 log_df['DaysofTheWeek'] = getWeekDaysOfTimeColumn(log_df[t_label])
@@ -100,24 +99,24 @@ def dcv(request):
 
             else:
                 x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
-                #print('Axis order')
-                #print(x_axis_order)
                 y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
-                #print(y_axis_order)
+
 
             if sort_attr == 'default':
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
             elif sort_attr == 'case:duration' and case_label in selection_list[:2] or 'case:duration' in selection_list:
-                #provisorisch:
-                trace_id_list = [a[0] for a in trace]
+                trace_sorted = sortByTraceDuration(trace_df).values.tolist()
+                trace_id_list = [a[0] for a in trace_sorted]
+                duration_list = [str(a[1]) for a in trace_sorted]
                 if selection_dict['xaxis_choice'] == case_label:
                     x_axis_order = trace_id_list
+                    print(x_axis_order)
                 elif selection_dict['xaxis_choice'] == 'case:duration':
                     x_axis_order = duration_list
                 if selection_dict['yaxis_choice'] == case_label:
                     y_axis_order = trace_id_list[::-1]
                 elif selection_dict['yaxis_choice'] == 'case:duration':
-                    y_axis_order = duration_list
+                    y_axis_order = duration_list[::-1]
 
             else:
                 if getCaseLabel(log_df) in selection_list:
@@ -149,7 +148,7 @@ def dcv(request):
             axes_order = [x_axis_order, y_axis_order]
 
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
-
+            #print(data_list)
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
