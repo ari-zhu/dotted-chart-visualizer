@@ -131,7 +131,7 @@
         <select onchange="this.form.submit()" id="trace_sort" name="trace_sort" style="width:150px; max-width: 100%;">
           {% if default_label_list %}
             <option value = "default;log" selected hidden>Sort on original order of traces in log</option>
-              <option value ="duration;log">Sort on duration of traces</option>
+              <option value ="case:duration;log">Sort on case:duration of trace</option>
             {% for attr in case_level_attributes %}
                 <option value="{{attr}};first"> Sort on {{attr}} of first event</option>
                 <option value="{{attr}};last"> Sort on {{attr}} of last event</option>
@@ -142,13 +142,13 @@
           {% else %}
             {% if sort_attr == "default"%}
                 <option value ="{{ sort_attr }};log" selected>Sort on original order of traces in log</option>
-                <option value = "duration;log">Sort on duration of trace</option>
-            {% elif sort_attr == "duration" %}
+                <option value = "case:duration;log">Sort on case:duration of trace</option>
+            {% elif sort_attr == "case:duration" %}
                 <option value = "{{ sort_attr }};log" selected>Sort on duration of trace</option>
                 <option value ="default;log">Sort on original order of traces in log</option>
             {% else %}
                 <option value ="default;log" >Sort on original order of traces in log</option>
-                <option value = "duration;log">Sort on duration of trace</option>
+                <option value = "case:duration;log">Sort on case:duration of trace</option>
             {% endif %}
 
             {% for attr in case_level_attributes %}

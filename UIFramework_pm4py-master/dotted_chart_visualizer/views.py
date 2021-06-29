@@ -26,6 +26,9 @@ def dcv(request):
         file_dir = os.path.join(event_logs_path, settings.EVENT_LOG_NAME)
         name, extension = os.path.splitext(file_dir)
         log_df, case_level_attributes,log_level_attributes = convertLogToDf(file_dir)
+        print("For Real")
+        print(type(log_df[getTimeLabel(log_df)][0]))
+        #print('for real end')
         log_attribute_list = log_level_attributes + ["case:duration", "time:DaysofTheWeek"] + case_level_attributes
 
         if request.method == 'POST':
@@ -39,8 +42,8 @@ def dcv(request):
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
 
+
             axes_only, complete, selection_list = selection(selection_dict)
-            print(selection_list)
 
             #if ('duration' and getCaseLabel(log_df)) and axes_only:
                 #draw graph
@@ -71,11 +74,16 @@ def dcv(request):
                 log_df = appendColumn(log_df, 'case:duration', duration_list, case_label)
 
 
-            if getTimeLabel(log_df):
+            if getTimeLabel(log_df) in selection_list:
+                #print("it's time")
                 t_label = getTimeLabel(log_df)
-                time_values_list = convertDateTimeToString(convertTimeStamps(log_df))
+
                 if extension == '.xes':
+                    time_values_list = convertDateTimeToString(convertTimeStamps(log_df))
                     convertDateTimeToStringsDf(log_df)
+                else:
+                    time_values_list = log_df[t_label].tolist()
+
 
                 if selection_dict['xaxis_choice'] == t_label:
                     x_axis_order = time_values_list
@@ -92,7 +100,7 @@ def dcv(request):
 
             if sort_attr == 'default':
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            elif sort_attr == 'case:duration' and getCaseLabel(log_df) in selection_list[:2] or 'case:duration' in selection_list:
+            elif sort_attr == 'case:duration' and case_label in selection_list[:2] or 'case:duration' in selection_list:
                 #provisorisch:
                 trace_id_list = [a[0] for a in trace]
                 if selection_dict['xaxis_choice'] == case_label:
@@ -132,7 +140,10 @@ def dcv(request):
                 legend_list = []
             else:
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
-
+            #print(label_list)
+            print(data_list)
+            #print("order list")
+            #print(type(axes_order[0]))
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,

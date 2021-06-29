@@ -1,12 +1,14 @@
 import os
 import pandas as pd
 import re
+import numpy as np
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from pm4py.objects.conversion.log import converter as log_converter
 from .filter_functions import get_Colored_Col as get_Col_OR_Shape
 from .filter_functions import get_Colored_AND_Shaped
 from .filter_functions import get_unique_values as to_set
 from .filter_functions import getAttributeNames
+from .filter_functions import getTimeLabel
 from .filter_functions import renameXesColumns
 from .filter_functions import sortByAttribute as sort_df
 
@@ -31,17 +33,19 @@ def convertLogToDf(file_dir):
     if (extension == ".xes"):
         xes_log = xes_importer_factory.apply(file_dir)
         df_event_log = log_converter.apply(xes_log, variant=log_converter.Variants.TO_DATA_FRAME)
+        df_event_log = df_event_log.replace(np.nan, 0)
         log_level_attributes = extract_attr_log_level(df_event_log)
         case_level_attributes = extract_attr_case_level(df_event_log, log_level_attributes)
         # log_level_attributes = [attr[5:] for attr in log_level_attributes]
         return df_event_log, case_level_attributes, log_level_attributes
 
     else:  # (extension == ".csv"):
-        df_event_log = pd.read_csv(file_dir)
+        df_event_log = pd.read_csv(file_dir, keep_default_na=False)
         if (not checkCommaSeparated(df_event_log)):
             separator = ';'
             if separator in df_event_log.columns[0]:
-                df_event_log = pd.read_csv(file_dir, sep=separator)
+                print("I am here")
+                df_event_log = pd.read_csv(file_dir, sep=separator, keep_default_na=False, parse_dates=False, infer_datetime_format= False)
         log_level_attr = extract_attr_log_level(df_event_log)
         case_level_attr = extract_attr_case_level(df_event_log,log_level_attr)
         return df_event_log, case_level_attr, log_level_attr
@@ -51,6 +55,12 @@ def convertLogToDf(file_dir):
 def checkCommaSeparated(df):
     if len((df.columns)) != 1:
         return True
+
+# check for NaNs and convert to String
+
+#def replaceNaNs(df):
+    #df.replace(np.nan,0)
+    #return df
 
 
 # extract user settings from dropdown menu
