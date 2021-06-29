@@ -9,7 +9,7 @@ from bootstrapdjango import settings
 from pm4py.objects.log.importer.xes import importer as xes_importer_factory
 from .filter_functions import setDefault, get_unique_values, convertTimeStamps, convertDateTimeToString, \
     sortByTime, getTimeLabel, sortByTraceDuration, \
-    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace
+    getCaseLabel, convertDateTimeToStringsDf,sortByFirstInTrace,sortByLastInTrace, getWeekDaysOfTimeColumn
 
 from .filter_functions import getAttributeNames
 from .utils import convertLogToDf, data_points, selection, appendColumn
@@ -29,7 +29,7 @@ def dcv(request):
         print("For Real")
         print(type(log_df[getTimeLabel(log_df)][0]))
         #print('for real end')
-        log_attribute_list = log_level_attributes + ["case:duration", "time:DaysofTheWeek"] + case_level_attributes
+        log_attribute_list = log_level_attributes + ["case:duration", "DaysofTheWeek"] + case_level_attributes
 
         if request.method == 'POST':
             selection_dict = {k: v[0] for k, v in dict(request.POST).items()}
@@ -39,6 +39,7 @@ def dcv(request):
             selection_dict.pop('trace_sort')
             #selection_list = [v for k, v in selection_dict.items()]
             case_label = getCaseLabel(log_df)
+            t_label = getTimeLabel(log_df)
             if "setButton" in request.POST:
                 selection_dict.pop('setButton')
 
@@ -73,10 +74,13 @@ def dcv(request):
                 duration_list = [str(a[1]) for a in trace]
                 log_df = appendColumn(log_df, 'case:duration', duration_list, case_label)
 
+            if 'DaysofTheWeek' in selection_list:
+                log_df['DaysofTheWeek'] = getWeekDaysOfTimeColumn(log_df[t_label])
+                days_order = ['Monday', 'Tuesday','Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
 
             if getTimeLabel(log_df) in selection_list:
                 #print("it's time")
-                t_label = getTimeLabel(log_df)
+                #t_label = getTimeLabel(log_df)
 
                 if extension == '.xes':
                     time_values_list = convertDateTimeToString(convertTimeStamps(log_df))
@@ -96,7 +100,10 @@ def dcv(request):
 
             else:
                 x_axis_order = get_unique_values(log_df, selection_dict['xaxis_choice']).tolist()
+                #print('Axis order')
+                #print(x_axis_order)
                 y_axis_order = get_unique_values(log_df, selection_dict['yaxis_choice']).tolist()[::-1]
+                #print(y_axis_order)
 
             if sort_attr == 'default':
                 label_list, data_list, legend_list = data_points(log_df, selection_dict)
@@ -133,17 +140,16 @@ def dcv(request):
                                 y_axis_order = sortByLastInTrace(log_df, sort_attr)[::-1]
 
             default_try = False
+
+            if selection_dict['xaxis_choice']== 'DaysofTheWeek':
+                x_axis_order = days_order
+            if selection_dict['yaxis_choice'] == 'DaysofTheWeek':
+                y_axis_order = days_order[::-1]
+
             axes_order = [x_axis_order, y_axis_order]
-            if 'case:duration' in selection_list[:2]: #same for days of the week
-                label_list = selection_list[:2] + ["Choose here", "Choose here"]
-                data_list = [x_axis_order, y_axis_order]
-                legend_list = []
-            else:
-                label_list, data_list, legend_list = data_points(log_df, selection_dict)
-            #print(label_list)
-            print(data_list)
-            #print("order list")
-            #print(type(axes_order[0]))
+
+            label_list, data_list, legend_list = data_points(log_df, selection_dict)
+
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
