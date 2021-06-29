@@ -151,13 +151,14 @@ def dcv(request):
             axes_order = [x_axis_order, y_axis_order]
 
             label_list, data_list, legend_list = data_points(log_df, selection_dict)
+            default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
             #print(data_list)
             return render(request, 'dcv.html',
                           {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
                              'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,
                              'axes_order': axes_order,
-                             'sort_attr': sort_attr, 'attr_level': attr_level, 'default_try': default_try})
+                             'sort_attr': sort_attr, 'attr_level': attr_level, 'default_try': default_try, 'default_axis_list': default_axis_list})
 
 
         else:
