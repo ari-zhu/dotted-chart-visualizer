@@ -11,13 +11,14 @@
 
 <body>
 <h3 class="mt-4" style="color:#00529F;padding-left: 10px;">Dotted Chart Visualizer</h3>
-<!-- Shows name of file currently in use at top of page-->
+<!-- Shows name of file currently in use at top of page or error message-->
 {% if fatal_error_message %}
     <p style="color:red;padding-left: 10px;"> {{ fatal_error_message }} </p>
 {% else %}
     <p style="color:green;padding-left: 10px;"> {{log_name}} is used as input.</p>
 {% endif %}
 
+<!-- Pop-Up for error messages-->
 {% if error_message %}
    <script> alert('Invalid Configuration');</script>
 {% endif %}
@@ -30,6 +31,7 @@
   <div id = "middlebox">
     <form  name="choice" action="" method = "POST">
       {% csrf_token %}
+      <!-- Dropdown menu selection for X-axis-->
         <label2 for="xaxis_choice">X-Axis:</label2>
         <select name="xaxis_choice" style="width:150px; max-width: 100%;">
 
@@ -54,6 +56,7 @@
           {% endif %}
 
         </select>
+        <!-- Dropdown menu selection for Y-axis-->
         <label2 for="yaxis_choice">Y-Axis:</label2>
         <br>
         <select name="yaxis_choice" style="width:150px; max-width: 100%;">
@@ -76,6 +79,7 @@
           {% endif %}
         </select>
         <br>
+        <!-- Dropdown menu selection for Color-->
         <label2 for="color_choice">Color:</label2>
         <br>
         <select name="color_choice" style="width:150px; max-width: 100%;">
@@ -99,6 +103,7 @@
 
         </select>
         <br>
+        <!-- Dropdown menu selection for Shape-->
         <label2 for="shape_choice">Shape:</label2>
         <br>
         <select name="shape_choice" style="width:150px; max-width: 100%;">
@@ -121,11 +126,7 @@
           {% endif %}
 
         </select>
-
-      <br>
-        <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
-      <br>
-
+        <!-- Dropdown menu selection Trace-Sort-->
         <label2 for="trace_sort">Sort Trace:</label2>
         <br>
         <select onchange="this.form.submit()" id="trace_sort" name="trace_sort" style="width:150px; max-width: 100%;">
@@ -174,34 +175,46 @@
               {% endfor %}
             {% endif %}
         </select>
-        <br>  
-        <br>
-        <input style="margin-top: 10px;" title="Save visualization" type = "submit" class="btn btn-info" value = "Save visualization" name= "saveButton" id ='saveButton' />
-        <br>
-    </form>
 
+      <br>
+      <!--Set-Button-->
+        <input style="margin-top: 10px; max-width: 100%;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+    </form>
+    <!--Button to download an image of the current visualization-->
+    <br>
+    <input onclick="saveVis()" style="margin-top: 10px; max-width: 100%;" title="Save visualization" type = "button" class="btn btn-info" value = "Save visualization" name= "saveButton" id ='saveButton' />
+    <br>
   </div>
+  <!-- Div for the plotly-Graph-->
   <div id = "rightbox">
-    <div id="tester"></div>
+    <div id="graphbox"></div>
   </div>
 </div>
-
-<br>
-
+<!--Function to save plotly-Graph as image-->
 <script>
-
+function saveVis()
+{
+  if (confirm("Do you want to save visualization?")) 
+  {
+    Plotly.downloadImage("graphbox", {format: 'png', width: 800, height: 600, filename: 'newplot'}); 
+  } 
+}
+</script>
+<!--Function to draw the default visualization-->
+<script>
 function drawDefault()
 {
   var default_axis = {{ default_axis_list|safe }};
   var default_x = default_axis[0];
   var default_y = default_axis[1];
   var default_label = {{ default_label_list|safe}};
+  var marker_size = determineMarkerSize(default_x.length);
   var trace1 = {
     x: default_x,
     y: default_y,
     mode: 'markers',
     type: 'scatter',
-    marker: { size: 12, shape: 'square' }
+    marker: { size: marker_size }
   };
 
   var data = [ trace1 ];
@@ -210,22 +223,25 @@ function drawDefault()
 
   var layout = {
     showlegend: false,
-    xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': default_axes_order[0] ,title: default_label[0] },
-    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: default_label[1], automargin: true},
+    xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': default_axes_order[0] ,title: {text:default_label[0], standoff:20} , automargin: true},
+    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: {text:default_label[1], standoff:20}, automargin: true},
     margin: {
         l: 50,
         r: 50,
-        b: 50,
         t: 10,
       },
   };
 
-  Plotly.react("tester", data, layout);
+  Plotly.newPlot("graphbox", data, layout);
 }
 </script>
-
+<!--Function to draw the updated visualization-->
 <script>
-function drawSomething(){
+function drawUpdated()
+{
+  var default_axis = {{ default_axis_list|safe }};// needed for marker size
+  var default_x = default_axis[0];
+  var default_y = default_axis[1];
   var axis_values = {{axis_list|safe}};
   var x_values = axis_values[0];
   var y_values = axis_values[1];
@@ -239,21 +255,22 @@ function drawSomething(){
     'rgb(128, 0, 255)','rgb(255, 0, 255)','rgb(255, 0, 128)','rgb(128, 128, 128)'];
 
   var possible_shapes =[0,1,2,3,5,13,17,25];
+  var marker_size = determineMarkerSize(default_x.length);
 
-  if((chosen[2]=="Choose here")&&(chosen[3]=="Choose here"))
+  if((chosen[2]=="Choose here")&&(chosen[3]=="Choose here"))// Only x- and y- axes values chosen
   {
     var trace1 = {
       x: x_values,
       y: y_values,
       mode: 'markers',
       type: 'scatter',
-      marker: {size: 12, color: possible_colors[5]},
+      marker: {size: marker_size, color: possible_colors[5]},
       showlegend: false,
     };
 
     var data = [ trace1 ];
   }
-  else if((chosen[2]!="Choose here")&&(chosen[3]=="Choose here"))
+  else if((chosen[2]!="Choose here")&&(chosen[3]=="Choose here"))// Everything, but Shapes chosen
   {
     var data = [];
     for (var i = 0; i <= 7; ++i) {
@@ -263,31 +280,23 @@ function drawSomething(){
         mode: 'markers',
         type: 'scatter',
         name: legend_list_colors[i],
-        marker: { size: 12, color: possible_colors[i] }
+        marker: { size: (marker_size), color: possible_colors[i] }
       };
       data.push(j);
     }
-
-    //var layout = {
-    //  showlegend: true,
-    //  xaxis: { /*type: 'category', */ /*"categoryorder": "array",
-    //    "categoryarray":  [3,2,1,6,5,4],*/ title: chosen[0] },
-    //  yaxis: { /*type: 'category', */ title: chosen[1], automargin: true}
-    //};
-
   }
-  else if((chosen[2]=="Choose here")&&(chosen[3]!="Choose here"))
+  else if((chosen[2]=="Choose here")&&(chosen[3]!="Choose here"))// Everything, but Colors chosen
   {
     var data = [];
     for (var i = 0; i <= 7; ++i) {
       var j = {
-        x: x_values[i],//['a'],
-        y: y_values[i],//['b'],
+        x: x_values[i],
+        y: y_values[i],
         mode: 'markers',
         type: 'scatter',
         name: legend_list_shapes[i],
         marker: {
-          size: 12,
+          size: (marker_size+1),
           color: possible_colors[5],
           symbol: possible_shapes[i],
           line: { color: 'rgb(255,255,255)', width: 1}
@@ -295,14 +304,8 @@ function drawSomething(){
       };
       data.push(j);
     }
-
-    //var layout = {
-    //  showlegend: true,
-    //  xaxis: { /*type: 'date',*/ title: chosen[0] },
-    //  yaxis: { /*type: 'category',*/ title: chosen[1], automargin: true}
-    //};
   }
-  else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))
+  else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))//Everything chosen
   {
     var data = [];
     for (var i = 0; i <= (x_values.length-1); ++i) {
@@ -313,7 +316,7 @@ function drawSomething(){
         type: 'scatter',
         name: legend_list_colors[Math.floor(i/(legend_list_shapes.length))] + ', ' + legend_list_shapes[i%(legend_list_shapes.length)],
         marker: {
-          size: 12,
+          size: (marker_size+1),
           color: possible_colors[Math.floor(i/(legend_list_shapes.length))],
           symbol: possible_shapes[i%(legend_list_shapes.length)],
           line: { color: 'rgb(255,255,255)', width: 1}
@@ -322,7 +325,7 @@ function drawSomething(){
       };
       data.push(j);
     }
-    for (var i = 0; i <= (legend_list_colors.length-1); ++i) {
+    for (var i = 0; i <= (legend_list_colors.length-1); ++i) { //Dummy traces for legend
       var j = {
         x: [null],//['a'],
         y: [null],//['b'],
@@ -330,7 +333,7 @@ function drawSomething(){
         type: 'scatter',
         name: legend_list_colors[i],
         marker: {
-          size: 12,
+          size: (marker_size+1),
           color: possible_colors[i],
           symbol: possible_shapes[0]
         },
@@ -338,15 +341,15 @@ function drawSomething(){
       };
       data.push(j);
     }
-    for (var i = 0; i <= (legend_list_shapes.length-1); ++i) {
+    for (var i = 0; i <= (legend_list_shapes.length-1); ++i) { //Dummy traces for legend
       var j = {
-        x: [null],//['a'],
-        y: [null],//['b'],
+        x: [null],
+        y: [null],
         mode: 'markers',
         type: 'scatter',
         name: legend_list_shapes[i],
         marker: {
-          size: 12,
+          size: (marker_size+1),
           color: 'rgb(0,0,0)',
           symbol: possible_shapes[i]
         },
@@ -354,20 +357,14 @@ function drawSomething(){
       };
       data.push(j);
     }
-
-    //var layout = {
-    //  showlegend: true,
-    //  xaxis: { /*type: 'date',*/ title: chosen[0] },
-    //  yaxis: { /*type: 'category',*/ title: chosen[1], automargin: true}
-    //};
   }
-  if (chosen[0].includes("time"))
+  if (chosen[0].includes("time")||chosen[0].includes("Time")) //Special case, if time is chosen for x-axis
   {
     var layout = {
     showlegend: true,
     xaxis: {
       type: 'date',
-      title: chosen[0],
+      title: {text:chosen[0], standoff:20},
       rangeselector: {
         buttons: [
         {
@@ -397,38 +394,57 @@ function drawSomething(){
         {step: 'all'}
         ]
 	    },
+      automargin: true
     },
-    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: chosen[1], automargin: true},
+    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: {text:chosen[1], standoff:20}, automargin: true},
     margin: {
         l: 50,
         r: 50,
-        b: 50,
         t: 10,
       },
     };
     }
-    else
+    else //Time is not chosen
     {
       var layout = {
       showlegend: true,
-      xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: chosen[0] },
-      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: chosen[1], automargin: true},
+      xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: {text:chosen[0], standoff:20}, automargin: true },
+      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: {text:chosen[1], standoff:20}, automargin: true},
       margin: {
         l: 50,
         r: 50,
-        b: 50,
         t: 10,
       },
       };
     }
 
-  Plotly.react("tester", data, layout)
+
+  Plotly.newPlot("graphbox", data, layout); //Actually draws the plot
+}
+</script>
+<!--Function to enable a (somewhat) dynamic marker size based on the number of points in the graph-->
+<script>
+function determineMarkerSize(p1)
+{
+  if (p1<100)
+  {
+    return 12;
+  }
+  else if (p1<200)
+  {
+    return 8;
+  }
+  else
+  {
+    return 4;
+  }
+  return 4;
 }
 </script>
 
-
+<!--if-condition to determine if the default graph or the updated one is drawn-->
 {% if default_try == False %}
-  <script>drawSomething();</script>
+  <script>drawUpdated();</script>
 {% else %}
   <script>drawDefault();</script>
 {% endif %}
