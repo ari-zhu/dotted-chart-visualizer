@@ -1,0 +1,118 @@
+{%  extends "base.html" %}
+
+
+{% block content  %}
+
+<head>
+	<!-- Load plotly.js into the DOM -->
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'>
+    </script>
+</head>
+
+<body>
+<!-- Shows name of file currently in use at top of page-->
+{% if error_message %}
+    <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
+{% else %}
+    <p style="color:green;"> {{log_name}} is used as input.</p>
+{% endif %}
+
+<!-- Dropdown menu selections -->
+<br>
+<div class="row">
+  <div class=" col-sm-6 col-md-7 col-lg-8">
+    <form  name="choice" action="" method = "POST">
+      {% csrf_token %}
+        <p>X-axis:</p>
+        <select name="xaxis_choice">
+          {% for attr in attribute_list %}
+            {% if attr ==  default_label_list.0 %}
+              <option value="{{attr}}" selected>{{attr}}</option>
+            {% else %}
+              <option value="{{attr}}">{{attr}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+
+        <p>Y-axis:</p>
+        <select name="yaxis_choice">
+          {% for attr in attribute_list %}
+            {% if attr ==  default_label_list.1 %}
+              <option value="{{attr}}" selected>{{attr}}</option>
+            {% else %}
+              <option value="{{attr}}">{{attr}}</option>
+            {% endif %}
+          {% endfor %}
+        </select>
+
+        <p>Color:</p>
+        <select name="color_choice">
+          <option selected hidden>Choose here</option>
+          {% for attr in attribute_list %}
+            <option value="{{attr}}">{{attr}}</option>
+          {% endfor %}
+        </select>
+
+        <p>Shape:</p>
+        <select name="shape_choice">
+          <option selected hidden>Choose here</option>
+          {% for attr in attribute_list %}
+            <option value="{{attr}}">{{attr}}</option>
+          {% endfor %}
+        </select>
+
+        <input style="margin-top: 10px;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+
+    </form>
+  </div>
+</div>
+<br>
+
+<script>
+    var default_axis = {{ default_axis_list|safe }};
+    var default_x = default_axis[0];
+    var default_y = default_axis[1];
+    //var default_x = {{ default_x_axis_list|safe }};
+    //var default_y = {{ default_y_axis_list|safe }};
+    //for (int i = 0, i<default_axis.length, i++)
+    //{
+        //if(chosen_x_axis == attributes_list[i])
+        //{
+          //var default_x = default_axis[i];
+        //}
+        //if(chosen_y_axis == attributes_list[i])
+        //{
+          //var default_y = default_axis[i];
+        //}
+    //}
+    var default_label = {{default_label_list|safe}};
+</script>
+
+
+
+
+<div id='myDiv'>
+    <script>
+    var trace1 = {
+    x: default_x,
+    y: default_y,
+    mode: 'markers',
+    type: 'scatter',
+    marker: { size: 12 }
+  };
+
+  var layout = {
+    showlegend: false,
+    xaxis: { type: 'category', title: default_label[0]},
+    yaxis: { type: 'category', title: default_label[1], automargin: true}
+  };
+
+  var data = [ trace1 ];
+
+  Plotly.newPlot('myDiv', data, layout);
+
+  </script></div>
+
+</body>
+
+    {% endblock %}

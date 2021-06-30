@@ -5,272 +5,453 @@
 
 <head>
 	<!-- Load plotly.js into the DOM -->
-
-	<script src='https://cdn.plot.ly/plotly-latest.min.js'></script>
-
+	<script src='https://cdn.plot.ly/plotly-latest.min.js'>
+    </script>
 </head>
 
 <body>
-<!-- Shows name of file currently in use at top of page-->
-
-{% if error_message %} 
-    <p style="color:red;"> You have not set any event log as input. Use "Event Data" tab to set an event log as input!</p>
+<h3 class="mt-4" style="color:#00529F;padding-left: 10px;">Dotted Chart Visualizer</h3>
+<!-- Shows name of file currently in use at top of page or error message-->
+{% if fatal_error_message %}
+    <p style="color:red;padding-left: 10px;"> {{ fatal_error_message }} </p>
 {% else %}
-    <p style="color:green;"> {{log_name}} is used as input.</p>
+    <p style="color:green;padding-left: 10px;"> {{log_name}} is used as input.</p>
 {% endif %}
-<!--<p>{{default_x_axis_list1}}</p> <p>{{default_y_axis_list1}}</p>-->
 
-<script> 
-    var default_x = {{ default_x_axis_list|safe }};
-    var default_y = {{ default_y_axis_list|safe }};
-</script> 
+<!-- Pop-Up for error messages-->
+{% if error_message %}
+   <script> alert('Invalid Configuration');</script>
+{% endif %}
 
-<div id='myDiv'>
-    <script>
-    var trace1 = {
+
+<!-- Dropdown menu selections -->
+<br>
+<div id = "boxes">
+  <div id = "leftbox"></div>
+  <div id = "middlebox">
+    <form  name="choice" action="" method = "POST">
+      {% csrf_token %}
+      <!-- Dropdown menu selection for X-axis-->
+        <label2 for="xaxis_choice">X-Axis:</label2>
+	<br>
+        <select name="xaxis_choice" style="width:150px; max-width: 100%;">
+
+          {% if default_label_list %}
+            {% for attr in attribute_list %}
+              {% if attr ==  default_label_list.0 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% if label_list %}
+            {% for attr in attribute_list %}
+              {%if attr == label_list.0 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+        </select>
+	<br>
+        <!-- Dropdown menu selection for Y-axis-->
+        <label2 for="yaxis_choice">Y-Axis:</label2>
+        <br>
+        <select name="yaxis_choice" style="width:150px; max-width: 100%;">
+          {% if default_label_list %}
+            {% for attr in attribute_list %}
+              {% if attr ==  default_label_list.1 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% else %}}
+            {% for attr in attribute_list %}
+              {%if attr == label_list.1 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </select>
+        <br>
+        <!-- Dropdown menu selection for Color-->
+        <label2 for="color_choice">Color:</label2>
+        <br>
+        <select name="color_choice" style="width:150px; max-width: 100%;">
+          {% if default_label_list %}
+            <option selected hidden>Choose here</option>
+            {% for attr in attribute_list %}
+             <option value="{{attr}}">{{attr}}</option>
+            {% endfor %}
+          {% else %}
+            {% if label_list.2 == "Choose here" %}
+                <option selected hidden>Choose here</option>
+            {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.2 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+        </select>
+        <br>
+        <!-- Dropdown menu selection for Shape-->
+        <label2 for="shape_choice">Shape:</label2>
+        <br>
+        <select name="shape_choice" style="width:150px; max-width: 100%;">
+          {% if default_label_list %}
+            <option selected hidden>Choose here</option>
+            {% for attr in attribute_list %}
+             <option value="{{attr}}">{{attr}}</option>
+            {% endfor %}
+          {% else %}
+            {% if label_list.3 == "Choose here" %}
+                <option selected hidden>Choose here</option>
+            {% endif %}
+            {% for attr in attribute_list %}
+              {% if attr == label_list.3 %}
+                <option value="{{attr}}" selected>{{attr}}</option>
+              {% else %}
+                <option value="{{attr}}">{{attr}}</option>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+        </select>
+	<br>
+        <!-- Dropdown menu selection Trace-Sort-->
+        <label2 for="trace_sort">Sort Trace:</label2>
+        <br>
+        <select onchange="this.form.submit()" id="trace_sort" name="trace_sort" style="width:150px; max-width: 100%;">
+          {% if default_label_list %}
+            <option value = "default;log" selected hidden>Sort on original order of traces in log</option>
+              <option value ="case:duration;log">Sort on case:duration of trace</option>
+            {% for attr in case_level_attributes %}
+                <option value="{{attr}};first"> Sort on {{attr}} of first event</option>
+                <option value="{{attr}};last"> Sort on {{attr}} of last event</option>
+            {% endfor %}
+            {% for attr in log_level_attributes %}
+                <option value="{{attr}};log"> Sort on {{attr}} of trace</option>
+            {% endfor %}
+          {% else %}
+            {% if sort_attr == "default"%}
+                <option value ="{{ sort_attr }};log" selected>Sort on original order of traces in log</option>
+                <option value = "case:duration;log">Sort on case:duration of trace</option>
+            {% elif sort_attr == "case:duration" %}
+                <option value = "{{ sort_attr }};log" selected>Sort on duration of trace</option>
+                <option value ="default;log">Sort on original order of traces in log</option>
+            {% else %}
+                <option value ="default;log" >Sort on original order of traces in log</option>
+                <option value = "case:duration;log">Sort on case:duration of trace</option>
+            {% endif %}
+
+            {% for attr in case_level_attributes %}
+                 {% if attr == sort_attr %}
+                      {% if attr_level == 'first' %}
+                          <option value="{{ attr }};first" selected>Sort on {{ attr }} of first event</option>
+                          <option value="{{ attr }};last" >Sort on {{ attr }} of last event</option>
+                      {% else %}
+                           <option value="{{ attr }};last" selected>Sort on {{ attr }} of last event</option>
+                           <option value="{{ attr }};first">Sort on {{ attr }} of first event</option>
+                      {% endif %}
+                 {% else %}
+                        <option value="{{ attr }};last">Sort on {{ attr }} of last event</option>
+                        <option value="{{ attr }};first">Sort on {{ attr }} of first event</option>
+                    {% endif %}
+              {% endfor %}
+
+            {% for attr in log_level_attributes %}
+                {% if sort_attr == attr%}
+                    <option value="{{ attr }};log" selected>Sort on {{ attr }} of log</option>
+                {% endif %}
+                    <option value = "{{ attr }};log">Sort on {{ attr }} of log</option>
+              {% endfor %}
+            {% endif %}
+        </select>
+
+      <br>
+      <!--Set-Button-->
+        <input style="margin-top: 10px; max-width: 100%;" data-toggle="tooltip" data-placement="top" title="Set as the input" type = "submit" class="btn btn-success" value = "Set" name= "setButton" id ='setButton' />
+    </form>
+    <!--Button to download an image of the current visualization-->
+    <br>
+    <input onclick="saveVis()" style="margin-top: 10px; max-width: 100%;" title="Save visualization" type = "button" class="btn btn-info" value = "Save visualization" name= "saveButton" id ='saveButton' />
+
+  </div>
+  <!-- Div for the plotly-Graph-->
+  <div id = "rightbox">
+    <div id="graphbox"></div>
+  </div>
+</div>
+<!--Function to save plotly-Graph as image-->
+<script>
+function saveVis()
+{
+  if (confirm("Do you want to save visualization?")) 
+  {
+    Plotly.downloadImage("graphbox", {format: 'png', width: 800, height: 600, filename: 'newplot'}); 
+  } 
+}
+</script>
+<!--Function to draw the default visualization-->
+<script>
+function drawDefault()
+{
+  var default_axis = {{ default_axis_list|safe }};
+  var default_x = default_axis[0];
+  var default_y = default_axis[1];
+  var default_label = {{ default_label_list|safe}};
+  var marker_size = determineMarkerSize(default_x.length);
+  var trace1 = {
     x: default_x,
     y: default_y,
     mode: 'markers',
     type: 'scatter',
-    marker: { size: 12 }
+    marker: { size: marker_size }
   };
+
+  var data = [ trace1 ];
+
+  var default_axes_order = {{ default_axis_order |safe }}
 
   var layout = {
     showlegend: false,
-    xaxis: { type: 'category', title: '{{ default_x_axis_label|safe }}'},
-    yaxis: { type: 'category', title: '{{ default_y_axis_label|safe }}', automargin: true}
+    xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': default_axes_order[0] ,title: {text:default_label[0], standoff:20} , automargin: true},
+    yaxis: {'type': 'category','categoryorder': 'array', 'categoryarray': default_axes_order[1], title: {text:default_label[1], standoff:20}, automargin: true},
+    margin: {
+        l: 50,
+        r: 50,
+        t: 10,
+      },
   };
-  
-  var data = [ trace1 ];
-  
-  Plotly.newPlot('myDiv', data, layout);
-  
-  </script></div> 
 
-<!-- Used as an example list of attributes-->
-<!--
-<script>
-    var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
+  Plotly.newPlot("graphbox", data, layout);
+}
 </script>
--->
+<!--Function to draw the updated visualization-->
+<script>
+function drawUpdated()
+{
+  var default_axis = {{ default_axis_list|safe }};// needed for marker size
+  var default_x = default_axis[0];
+  var default_y = default_axis[1];
+  var axis_values = {{axis_list|safe}};
+  var x_values = axis_values[0];
+  var y_values = axis_values[1];
+  var chosen = {{label_list|safe}};
+  var legend_list = {{legend_list|safe}};
+  var axes_order={{ axes_order|safe }}
+  var legend_list_colors = legend_list[0];
+  var legend_list_shapes = legend_list[1];
+  var possible_colors =['rgb(255, 0, 0)','rgb(255, 128, 0)','rgb(255, 255, 0)',
+    'rgb(128, 255, 0)','rgb(0, 255, 255)','rgb(0, 128, 255)','rgb(0, 0, 255)',
+    'rgb(128, 0, 255)','rgb(255, 0, 255)','rgb(255, 0, 128)','rgb(128, 128, 128)'];
 
-<!-- Example dropdown menu-->
-<!--
-<p>X-axis attribute</p>
-<select name="X-axis" id="X-axis">
-    <script>
-    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-    for(i=0; i<attributes_list.length; i++){
-        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
-    }
-    </script>
-</select>
--->
-<!--
-<p>Y-axis attribute</p>
-<select name="X-axis" id="X-axis">
-    <script>
-    //var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-    for(i=0; i<attributes_list.length; i++){
-        document.write('<option value="'+ attributes_list[i] +'">'+ attributes_list[i] +'</option>');
-    }
-    </script>
+  var possible_shapes =[0,1,2,3,5,13,17,25];
+  var marker_size = determineMarkerSize(default_x.length);
 
-</select>
+  if((chosen[2]=="Choose here")&&(chosen[3]=="Choose here"))// Only x- and y- axes values chosen
+  {
+    var trace1 = {
+      x: x_values,
+      y: y_values,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {size: marker_size, color: possible_colors[5]},
+      showlegend: false,
+    };
 
-<p>Trace Sorting</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
-<p>Color</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
-<p>Shape</p>
-<select name="cars" id="cars">
-    <option value="volvo">Volvo</option>
-    <option value="saab">Saab</option>
-    <option value="mercedes">Mercedes</option>
-    <option value="audi">Audi</option>
-</select>
-
--->
-<!-- Example button-->
-<!--
-<button onclick="myFunction()">Save visualization</button>
-
-<div class="showcase__section" id="bubble">
-    <div class="spacer --small"></div>
-    <div id="bubbleplots">
-      <div class="bubbleplot" data-num="0">
-        <div class="plot" id="plotdiv"></div>
-        <div class="control-row">
-        Country:<br>
-        <select class="countrydata">
-          </select>
-        </div>
-      </div>
-    </div>
-</div>
-        
-  <script>
-      //imports data
-      Plotly.d3.csv('https://raw.githubusercontent.com/plotly/datasets/master/gapminderDataFiveYear.csv', function(err, rows){
-//unpacks data
-function unpack(rows, key) {
-    return rows.map(function(row) { return row[key]; });
-}
-//initializing data variables based on imported data
-var allCountryNames = unpack(rows, 'country'),
-allYear = unpack(rows, 'year'),
-allGdp = unpack(rows, 'gdpPercap'),
-listofCountries = [],
-currentCountry,
-currentGdp = [],
-currentYear = [];
-
-//filling list of countries
-for (var i = 0; i < allCountryNames.length; i++ ){
-if (listofCountries.indexOf(allCountryNames[i]) === -1 ){
-  listofCountries.push(allCountryNames[i]);
-}
-}
-
-//Adapts X and Y coordinates according to the chosen country
-function getCountryData(chosenCountry) {
-currentGdp = [];
-currentYear = [];
-for (var i = 0 ; i < allCountryNames.length ; i++){
-  if ( allCountryNames[i] === chosenCountry ) {
-    currentGdp.push(allGdp[i]);
-    currentYear.push(allYear[i]);
-  } 
-}
-};
-
-// Default Country Data
-setBubblePlot('Afghanistan');
-
-function setBubblePlot(chosenCountry) {
-getCountryData(chosenCountry);  
-
-//Constructed trace
-var trace1 = {
-  x: currentYear,
-  y: currentGdp,
-  mode: 'markers',
-  marker: {
-    symbol: 'diamond',
-    size: 12, 
-    opacity: 0.5
+    var data = [ trace1 ];
   }
-};
+  else if((chosen[2]!="Choose here")&&(chosen[3]=="Choose here"))// Everything, but Shapes chosen
+  {
+    var data = [];
+    for (var i = 0; i <= 7; ++i) {
+      var j = {
+        x: x_values[i],
+        y: y_values[i],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[i],
+        marker: { size: (marker_size), color: possible_colors[i] }
+      };
+      data.push(j);
+    }
+  }
+  else if((chosen[2]=="Choose here")&&(chosen[3]!="Choose here"))// Everything, but Colors chosen
+  {
+    var data = [];
+    for (var i = 0; i <= 7; ++i) {
+      var j = {
+        x: x_values[i],
+        y: y_values[i],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_shapes[i],
+        marker: {
+          size: (marker_size+1),
+          color: possible_colors[5],
+          symbol: possible_shapes[i],
+          line: { color: 'rgb(255,255,255)', width: 1}
+        }
+      };
+      data.push(j);
+    }
+  }
+  else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))//Everything chosen
+  {
+    var data = [];
+    for (var i = 0; i <= (x_values.length-1); ++i) {
+      var j = {
+        x: x_values[i],//['a'],
+        y: y_values[i],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[Math.floor(i/(legend_list_shapes.length))] + ', ' + legend_list_shapes[i%(legend_list_shapes.length)],
+        marker: {
+          size: (marker_size+1),
+          color: possible_colors[Math.floor(i/(legend_list_shapes.length))],
+          symbol: possible_shapes[i%(legend_list_shapes.length)],
+          line: { color: 'rgb(255,255,255)', width: 1}
+        },
+        showlegend: false,
+      };
+      data.push(j);
+    }
+    for (var i = 0; i <= (legend_list_colors.length-1); ++i) { //Dummy traces for legend
+      var j = {
+        x: [null],//['a'],
+        y: [null],//['b'],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_colors[i],
+        marker: {
+          size: (marker_size+1),
+          color: possible_colors[i],
+          symbol: possible_shapes[0]
+        },
+        showlegend: true,
+      };
+      data.push(j);
+    }
+    for (var i = 0; i <= (legend_list_shapes.length-1); ++i) { //Dummy traces for legend
+      var j = {
+        x: [null],
+        y: [null],
+        mode: 'markers',
+        type: 'scatter',
+        name: legend_list_shapes[i],
+        marker: {
+          size: (marker_size+1),
+          color: 'rgb(0,0,0)',
+          symbol: possible_shapes[i]
+        },
+        showlegend: true,
+      };
+      data.push(j);
+    }
+  }
+  if (chosen[0].includes("time")||chosen[0].includes("Time")) //Special case, if time is chosen for x-axis
+  {
+    var layout = {
+    showlegend: true,
+    xaxis: {
+      type: 'date',
+      title: {text:chosen[0], standoff:20},
+      rangeselector: {
+        buttons: [
+        {
+          count: 1,
+          label: '1m',
+          step: 'month',
+          stepmode: 'backward'
+        },
+        {
+          count: 6,
+          label: '6m',
+          step: 'month',
+          stepmode: 'backward'
+        },
+        {
+          count: 1,
+          label: '1y',
+          step: 'year',
+          stepmode: 'backward'
+        },
+        {
+          count: 5,
+          label: '5y',
+          step: 'year',
+          stepmode: 'backward'
+        },
+        {step: 'all'}
+        ]
+	    },
+      automargin: true
+    },
+    yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1], title: {text:chosen[1], standoff:20}, automargin: true},
+    margin: {
+        l: 50,
+        r: 50,
+        t: 10,
+      },
+    };
+    }
+    else //Time is not chosen
+    {
+      var layout = {
+      showlegend: true,
+      xaxis: {'type': 'category', 'categoryorder': 'array', 'categoryarray': axes_order[0], title: {text:chosen[0], standoff:20}, automargin: true },
+      yaxis: { 'type': 'category','categoryorder': 'array', 'categoryarray': axes_order[1],title: {text:chosen[1], standoff:20}, automargin: true},
+      margin: {
+        l: 50,
+        r: 50,
+        t: 10,
+      },
+      };
+    }
 
-var data = [trace1];
 
-//var layout = {
-//  title: 'GDP per cap according to Country<br>'+ chosenCountry + ' GDP'
-//};
-
-Plotly.newPlot('plotdiv', data);
-};
-
-var innerContainer = document.querySelector('[data-num="0"'),
-plotEl = innerContainer.querySelector('.plot'),
-countrySelector = innerContainer.querySelector('.countrydata');
-
-function assignOptions(textArray, selector) {
-for (var i = 0; i < textArray.length;  i++) {
-  var currentOption = document.createElement('option');
-  currentOption.text = textArray[i];
-  selector.appendChild(currentOption);
+  Plotly.newPlot("graphbox", data, layout); //Actually draws the plot
 }
-}
-
-assignOptions(listofCountries, countrySelector);
-
-function updateCountry(){
-setBubblePlot(countrySelector.value);
-}
-
-countrySelector.addEventListener('change', updateCountry, false);
-});
-</script>-->
-
-
-<!--
-
-<div class="showcase__section" id="bubble">
-    <div class="spacer --small"></div>
-    <div id="bubbleplots">
-      <div class="bubbleplot" data-num="0">
-        <div class="plot" id="plotdiv"></div>
-        <div class="control-rowX">
-          X-axis: <select class="xdata">
-          </select>
-        </div>
-        <div class="control-rowY">
-          Y-axis: <select class="ydata">
-          </select>
-        </div>
-      </div>
-    </div>
-</div>
-
-
-
-<script>
-var attributes_list = new Array("concept:name", "org:resource", "time:timestamp", "Activity", "Resource", "Costs");
-
-function getChosenAttributesData(chosenAttributeX, chosenAttributeY) {
-currentX = [];
-currentY = [];
-for (var i = 0 ; i < attributes_list.length ; i++){
-  if ( attributes_list[i] === chosenAttributeX ) {
-    currentGdp.push(currentX[i]);
-  } 
-  if ( attributes_list[i] === chosenAttributeX ) {
-    currentGdp.push(currentX[i]);
-  } 
-}
-};
-
-countrySelector = innerContainer.querySelector('.countrydata');
-
-function assignOptions(textArray, selector) {
-for (var i = 0; i < textArray.length;  i++) {
-  var currentOption = document.createElement('option');
-  currentOption.text = textArray[i];
-  selector.appendChild(currentOption);
-}
-}
-
-assignYOptions(listofAttributes, attributesYSelector);
-assignXOptions(listofAttributes, attributesXSelector);
-
-function updateXAttributes(){
-setBubblePlot(attributesXSelector.value);
-}
-function updateYAttributes(){
-setBubblePlot(attributesYSelector.value);
-}
-
-attributesYSelector.addEventListener('change', updateYAttributes, false);
-attributesXSelector.addEventListener('change', updateXAttributes, false);
 </script>
--->
+<!--Function to enable a (somewhat) dynamic marker size based on the number of points in the graph-->
+<script>
+function determineMarkerSize(p1)
+{
+  if (p1<100)
+  {
+    return 12;
+  }
+  else if (p1<200)
+  {
+    return 8;
+  }
+  else
+  {
+    return 4;
+  }
+  return 4;
+}
+</script>
+
+<!--if-condition to determine if the default graph or the updated one is drawn-->
+{% if default_try == False %}
+  <script>drawUpdated();</script>
+{% else %}
+  <script>drawDefault();</script>
+{% endif %}
 
 </body>
 
     {% endblock %}
-
-
-
