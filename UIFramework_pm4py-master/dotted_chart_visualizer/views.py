@@ -154,7 +154,7 @@ def dcv(request):
             default_axis_list, default_x_axis_label, default_y_axis_label, default_axis_order = setDefault(log_df)
             #print(data_list)
             return render(request, 'dcv.html',
-                          {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
+                            {'log_name': settings.EVENT_LOG_NAME, 'axis_list': data_list, 'label_list': label_list,
                             'legend_list': legend_list, 'attribute_list': log_attribute_list,
                              'log_level_attributes': log_level_attributes, 'case_level_attributes':case_level_attributes,
                              'axes_order': axes_order,
