@@ -1,6 +1,6 @@
 # Dotted Chart Visualizer
 
-A a Python based, interactive Django app powered by [PM4PY](https://pm4py.fit.fraunhofer.de/), to display selected process data in the dotted chart visual style.
+A Python based, interactive Django app powered by [PM4PY](https://pm4py.fit.fraunhofer.de/) to display selected process data in the dotted chart visual style.
 
 ## Getting Started
 
