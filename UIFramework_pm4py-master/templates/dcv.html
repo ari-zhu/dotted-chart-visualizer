@@ -277,21 +277,43 @@ function drawUpdated()
   else if((chosen[2]!="Choose here")&&(chosen[3]=="Choose here"))// Everything, but Shapes chosen
   {
     var data = [];
-    for (var i = 0; i <= 7; ++i) {
-      var j = {
-        x: x_values[i],
-        y: y_values[i],
-        mode: 'markers',
-        type: 'scatter',
-        name: legend_list_colors[i],
-        marker: { size: (marker_size), color: possible_colors[i] }
-      };
-      data.push(j);
+    if (legend_list_colors.length <= 8)
+    {
+      for (var i = 0; i <= 7; ++i) 
+      {
+        var j = {
+          x: x_values[i],
+          y: y_values[i],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[i],
+          marker: { size: (marker_size), color: possible_colors[i] }
+        };
+        data.push(j);
+      }
+    }
+    else
+    {
+      for (var i = 0; i <= (legend_list_colors.length-1); ++i) {
+        var j = {
+          x: x_values[i],
+          y: y_values[i],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[i],
+          marker: { size: (marker_size), color: (i) }
+        };
+        data.push(j);
+      }
     }
   }
   else if((chosen[2]=="Choose here")&&(chosen[3]!="Choose here"))// Everything, but Colors chosen
   {
     var data = [];
+    if (legend_list_shapes.length >= 8)
+    {
+      alert('Maximum number of shapes is 8! Please choose a different attribute for shapes.');
+    }
     for (var i = 0; i <= 7; ++i) {
       var j = {
         x: x_values[i],
@@ -311,55 +333,115 @@ function drawUpdated()
   }
   else if((chosen[2]!="Choose here")&&(chosen[3]!="Choose here"))//Everything chosen
   {
-    var data = [];
-    for (var i = 0; i <= (x_values.length-1); ++i) {
-      var j = {
-        x: x_values[i],//['a'],
-        y: y_values[i],//['b'],
-        mode: 'markers',
-        type: 'scatter',
-        name: legend_list_colors[Math.floor(i/(legend_list_shapes.length))] + ', ' + legend_list_shapes[i%(legend_list_shapes.length)],
-        marker: {
-          size: (marker_size+1),
-          color: possible_colors[Math.floor(i/(legend_list_shapes.length))],
-          symbol: possible_shapes[i%(legend_list_shapes.length)],
-          line: { color: 'rgb(255,255,255)', width: 1}
-        },
-        showlegend: false,
-      };
-      data.push(j);
+    if (legend_list_shapes.length >= 8)
+    {
+      alert('Maximum number of shapes is 8! Please choose a different attribute for shapes.');
     }
-    for (var i = 0; i <= (legend_list_colors.length-1); ++i) { //Dummy traces for legend
-      var j = {
-        x: [null],//['a'],
-        y: [null],//['b'],
-        mode: 'markers',
-        type: 'scatter',
-        name: legend_list_colors[i],
-        marker: {
-          size: (marker_size+1),
-          color: possible_colors[i],
-          symbol: possible_shapes[0]
-        },
-        showlegend: true,
-      };
-      data.push(j);
+    if(legend_list_colors.length <= 8)
+    {
+      var data = [];
+      for (var i = 0; i <= (x_values.length-1); ++i) {
+        var j = {
+          x: x_values[i],
+          y: y_values[i],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[Math.floor(i/(legend_list_shapes.length))] + ', ' + legend_list_shapes[i%(legend_list_shapes.length)],
+          marker: {
+            size: (marker_size+1),
+            color: possible_colors[Math.floor(i/(legend_list_shapes.length))],
+            symbol: possible_shapes[i%(legend_list_shapes.length)],
+            line: { color: 'rgb(255,255,255)', width: 1}
+          },
+          showlegend: false,
+        };
+        data.push(j);
+      }
+      for (var i = 0; i <= (legend_list_colors.length-1); ++i) { //Dummy traces for legend
+        var j = {
+          x: [null],
+          y: [null],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[i],
+          marker: {
+            size: (marker_size+1),
+            color: possible_colors[i],
+            symbol: possible_shapes[0]
+          },
+          showlegend: true,
+        };
+        data.push(j);
+      }
+      for (var i = 0; i <= (legend_list_shapes.length-1); ++i) { //Dummy traces for legend
+        var j = {
+          x: [null],
+          y: [null],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_shapes[i],
+          marker: {
+            size: (marker_size+1),
+            color: 'rgb(0,0,0)',
+            symbol: possible_shapes[i]
+          },
+          showlegend: true,
+        };
+        data.push(j);
+      }
     }
-    for (var i = 0; i <= (legend_list_shapes.length-1); ++i) { //Dummy traces for legend
-      var j = {
-        x: [null],
-        y: [null],
-        mode: 'markers',
-        type: 'scatter',
-        name: legend_list_shapes[i],
-        marker: {
-          size: (marker_size+1),
-          color: 'rgb(0,0,0)',
-          symbol: possible_shapes[i]
-        },
-        showlegend: true,
-      };
-      data.push(j);
+    else
+    {
+      var data = [];
+      for (var i = 0; i <= (x_values.length-1); ++i) {
+        var j = {
+          x: x_values[i],
+          y: y_values[i],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[Math.floor(i/(legend_list_shapes.length))] + ', ' + legend_list_shapes[i%(legend_list_shapes.length)],
+          marker: {
+            size: (marker_size+1),
+            color: Math.floor(i/(legend_list_shapes.length)),
+            symbol: possible_shapes[i%(legend_list_shapes.length)],
+            line: { color: 'rgb(255,255,255)', width: 1}
+          },
+          showlegend: false,
+        };
+        data.push(j);
+      }
+      for (var i = 0; i <= (legend_list_colors.length-1); ++i) { //Dummy traces for legend
+        var j = {
+          x: [null],
+          y: [null],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_colors[i],
+          marker: {
+            size: (marker_size+1),
+            color: i,
+            symbol: possible_shapes[0]
+          },
+          showlegend: true,
+        };
+        data.push(j);
+      }
+      for (var i = 0; i <= (legend_list_shapes.length-1); ++i) { //Dummy traces for legend
+        var j = {
+          x: [null],
+          y: [null],
+          mode: 'markers',
+          type: 'scatter',
+          name: legend_list_shapes[i],
+          marker: {
+            size: (marker_size+1),
+            color: 'rgb(0,0,0)',
+            symbol: possible_shapes[i]
+          },
+          showlegend: true,
+        };
+        data.push(j);
+      }
     }
   }
   if (chosen[0].includes("time")||chosen[0].includes("Time")) //Special case, if time is chosen for x-axis
@@ -408,6 +490,20 @@ function drawUpdated()
       },
     hovermode: "closest",
     };
+    }
+    else if (chosen[0].includes("duration"))
+    {
+      var layout = {
+      showlegend: true,
+      xaxis: {'type': 'multicategory', title: {text:chosen[0], standoff:20}, automargin: true },
+      yaxis: { 'type': 'category', title: {text:chosen[1], standoff:20}, automargin: true},
+      margin: {
+        l: 50,
+        r: 50,
+        t: 10,
+      },
+      hovermode: "closest",
+      };
     }
     else //Time is not chosen
     {
